@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 // Contract boundary: a real HTTP upstream and durable link store. Two Silo
@@ -154,5 +155,72 @@ func TestLinkRejectsUnverifiedIdentityAndCredentialRedirects(t *testing.T) {
 	}
 	if reached {
 		t.Fatal("credentials followed off-server redirect")
+	}
+}
+
+func TestBrowserApprovalCannotCommitAfterCancelRelinkOrServerChange(t *testing.T) {
+	for _, action := range []string{"cancel", "relink", "server"} {
+		t.Run(action, func(t *testing.T) {
+			entered, release := make(chan struct{}), make(chan struct{})
+			upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				switch r.URL.Path {
+				case "/api/auth/device/init":
+					w.WriteHeader(201)
+					fmt.Fprint(w, `{"device_code":"private-race-code","user_code":"12345678","verification_path_complete":"/pair/device?user_code=12345678","expires_in":300,"interval":1}`)
+				case "/api/auth/device/token":
+					fmt.Fprint(w, `{"access_token":"rmm_old-approved-token","scopes":["me.read","roms.read","platforms.read","collections.read","firmware.read","assets.read","assets.write"]}`)
+				case "/api/users/me":
+					if r.Header.Get("Authorization") == "Bearer manual-new-token" {
+						fmt.Fprint(w, `{"id":22,"username":"new-account"}`)
+						return
+					}
+					close(entered)
+					<-release
+					fmt.Fprint(w, `{"id":11,"username":"old-account"}`)
+				}
+			}))
+			defer upstream.Close()
+			e, err := New(t.TempDir())
+			if err != nil {
+				t.Fatal(err)
+			}
+			e.Configure(upstream.URL)
+			flow, err := e.StartSignIn(context.Background(), "owner")
+			if err != nil {
+				t.Fatal(err)
+			}
+			done := make(chan error, 1)
+			go func() { _, err := e.PollSignIn(context.Background(), "owner", flow.ID); done <- err }()
+			select {
+			case <-entered:
+			case <-time.After(2 * time.Second):
+				close(release)
+				t.Fatal("verification never started")
+			}
+			switch action {
+			case "cancel":
+				_, err = e.CancelSignIn("owner", flow.ID)
+			case "relink":
+				_, err = e.Link(context.Background(), "owner", "manual-new-token", "")
+			case "server":
+				err = e.Configure("https://different.invalid")
+			}
+			close(release)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err = <-done; err == nil {
+				t.Fatal("stale approval committed")
+			}
+			connection := e.Status("owner")
+			if action == "relink" {
+				if !connection.Linked || connection.Identity.ID != 22 {
+					t.Fatal("late approval replaced the manually linked account")
+				}
+			} else if connection.Linked {
+				t.Fatal("cancelled/reconfigured approval persisted")
+			}
+		})
 	}
 }

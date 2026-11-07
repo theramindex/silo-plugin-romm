@@ -256,3 +256,13 @@ with color alone.
 - **Don't** use a glyph in place of the established text close control.
 - **Don't** promote platform metadata into an uppercase eyebrow.
 - **Don't** communicate error, selection or pending progress through color alone.
+
+## Browser approval connection
+
+The connection screen leads with a full-width, 48px minimum **Sign in to RomM**
+button. Token and pairing-code entry sit inside a secondary native disclosure.
+Pending approval stays inline: show the matching code in a quiet bordered panel,
+a clearly labeled external continuation link, a polite status message and Cancel.
+Use monospace only for the approval code. Preserve mobile stacking and visible
+focus throughout. Keep existing surfaces and spacing tokens; this flow adds no
+new palette. Confirm connection with the verified RomM username.

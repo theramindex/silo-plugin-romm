@@ -545,3 +545,49 @@ dialog::backdrop {
   font-size: 14px;
   min-height: 40px;
 }
+
+.browser-sign-in {
+  margin: 24px 0;
+}
+.browser-sign-in > .primary {
+  width: 100%;
+  min-height: 48px;
+}
+.manual-connection {
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+}
+.manual-connection summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 8px 0;
+}
+.approval-code {
+  display: block;
+  font:
+    700 24px ui-monospace,
+    monospace;
+  letter-spacing: 0.12em;
+  margin: 18px 0;
+  padding: 16px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.approval-link {
+  font-weight: 650;
+  text-underline-offset: 4px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -7,6 +7,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/binary"
+	"encoding/json"
 	"flag"
 	"fmt"
 	pluginv1 "github.com/Silo-Server/silo-plugin-sdk/pkg/pluginproto/silo/plugin/v1"
@@ -20,6 +21,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 )
 
 func main() {
@@ -32,9 +34,56 @@ func main() {
 	var mu sync.Mutex
 	assets := map[string][]byte{}
 	emulator := ""
+	var approvalCounter atomic.Int64
+	approvedFlows := map[string]bool{}
+	deniedFlows := map[string]bool{}
 	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		switch {
+		case r.URL.Path == "/api/auth/device/init":
+			code := fmt.Sprintf("%08d", approvalCounter.Add(1))
+			mu.Lock()
+			approvedFlows[code] = false
+			mu.Unlock()
+			w.WriteHeader(201)
+			fmt.Fprintf(w, `{"device_code":%q,"user_code":%q,"verification_path":"/pair/device","verification_path_complete":%q,"expires_in":300,"interval":1}`, code, code, "/pair/device?user_code="+code)
+		case r.URL.Path == "/pair/device":
+			w.Header().Set("Content-Type", "text/html")
+			fmt.Fprintf(w, `<!doctype html><title>RomM fixture approval</title><h1>Connect Silo Games</h1><p>Fixture account: Development player</p><form method="POST" action="/api/auth/device/approve"><input type="hidden" name="code" value="%s"><button>Approve Silo Games</button><button formaction="/api/auth/device/deny">Decline access</button></form>`, r.URL.Query().Get("user_code"))
+		case r.URL.Path == "/api/auth/device/approve":
+			r.ParseForm()
+			mu.Lock()
+			approvedFlows[r.Form.Get("code")] = true
+			mu.Unlock()
+			w.Header().Set("Content-Type", "text/html")
+			fmt.Fprint(w, `<!doctype html><title>Approved</title><h1>Approved</h1><p>You can return to Games.</p>`)
+		case r.URL.Path == "/api/auth/device/deny":
+			r.ParseForm()
+			mu.Lock()
+			deniedFlows[r.Form.Get("code")] = true
+			mu.Unlock()
+			w.Header().Set("Content-Type", "text/html")
+			fmt.Fprint(w, `<!doctype html><title>Declined</title><h1>Declined</h1>`)
+		case r.URL.Path == "/api/auth/device/token":
+			var payload struct {
+				Code string `json:"device_code"`
+			}
+			json.NewDecoder(r.Body).Decode(&payload)
+			mu.Lock()
+			approved := approvedFlows[payload.Code]
+			denied := deniedFlows[payload.Code]
+			mu.Unlock()
+			if denied {
+				w.WriteHeader(400)
+				fmt.Fprint(w, `{"detail":"access_denied"}`)
+				return
+			}
+			if !approved {
+				w.WriteHeader(400)
+				fmt.Fprint(w, `{"detail":"authorization_pending"}`)
+				return
+			}
+			fmt.Fprint(w, `{"access_token":"rmm_development-fixture-token","device_id":"fixture-device","scopes":["me.read","roms.read","platforms.read","collections.read","firmware.read","assets.read","assets.write"],"expires_at":null}`)
 		case r.URL.Path == "/api/users/me":
 			fmt.Fprint(w, `{"id":7,"username":"Development player"}`)
 		case r.URL.Path == "/api/platforms":

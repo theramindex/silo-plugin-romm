@@ -11,15 +11,25 @@ Install a platform-specific `.silo-plugin.zip` on the Ramindex Silo fork and
 set **RomM server → URL** in the plugin settings. The URL must be reachable
 from the Silo server, including private LAN addresses when appropriate.
 
-Open **Games** and connect a RomM client token or pairing code. Required
+Open **Games** and choose **Sign in to RomM**. RomM opens in a separate tab;
+sign in with your usual account or OIDC/SSO provider and approve **Silo Games**.
+Check that the approval code matches the plugin. The plugin then verifies your
+RomM identity and saves an encrypted connection for the active Silo profile.
+Keep the Games page open until it confirms the connection. Cancelled, declined
+or expired requests do not create a connection.
+
+The configured address must be reachable from both Silo and your browser for
+this flow. Browser approval uses RomM's `/api/auth/device/` endpoints, verified
+against RomM 5.4. If unavailable, expand **Use a token or pairing code**. Required
 scopes: `me.read`, `roms.read`, `platforms.read`, `collections.read`,
-`firmware.read`, `assets.read`, `assets.write`. Pairing codes come from RomM's
-client-token settings; exchanging a code still verifies `/api/users/me` before
-storing the connection. Servers without pairing can use the token field.
+`firmware.read`, `assets.read`, `assets.write`. No Silo or RomM password is stored.
+Pending approval credentials stay in server memory and expire; only a completed,
+verified connection is written to disk. A plugin restart requires starting any
+unfinished approval again. Saved connections continue to survive restarts.
 
 Every Silo account/profile has its own explicit RomM connection. Names and
-email addresses never determine identity. OIDC login in RomM can help you
-create the token but does not link accounts automatically. Reconnecting or
+email addresses never determine identity. OIDC login in RomM can complete browser approval; a Silo login by itself does
+not authorize access to RomM. Reconnecting or
 changing the configured server invalidates old player sessions.
 
 ## Progress

@@ -601,6 +601,27 @@
       "path": "/romm/assets/emulator/licenses/snes9x-LICENSE",
       "access": "authenticated",
       "navigable": false
+    },
+    {
+      "id": "romm-sign-in-start",
+      "path": "/romm/api/sign-in/start",
+      "method": "POST",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-sign-in-poll",
+      "path": "/romm/api/sign-in/poll",
+      "method": "POST",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-sign-in-cancel",
+      "path": "/romm/api/sign-in/cancel",
+      "method": "POST",
+      "access": "authenticated",
+      "navigable": false
     }
   ],
   "global_config_schema": [
@@ -620,7 +641,7 @@
     "display_name": "RomM for Silo",
     "summary": "Your RomM collection, with browser play and personal saves.",
     "description_markdown": "Browse platforms, collections and games from RomM. Connect each Silo profile to its own RomM account, then play NES, SNES, GB, GBC and GBA games using locally bundled EmulatorJS. Requires the Ramindex Silo loopback relay. No ROMs or BIOS are included.",
-    "setup_markdown": "Set the RomM server URL in plugin settings. Open Games and connect a scoped RomM client token or pairing code. Keep the plugin data directory on persistent storage.",
+    "setup_markdown": "Set the RomM server URL in plugin settings, reachable from Silo and your browser. Open Games, choose Sign in to RomM, and approve Silo Games using your normal RomM or OIDC login. Token and pairing-code entry remain available for older servers. Keep the plugin data directory on persistent storage.",
     "homepage_url": "https://github.com/theramindex/silo-plugin-romm",
     "source_url": "https://github.com/theramindex/silo-plugin-romm",
     "support_url": "https://github.com/theramindex/silo-plugin-romm/issues",

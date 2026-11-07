@@ -21,7 +21,10 @@ async function api(name, { query, body, signal } = {}) {
   });
   const data = await response.json();
   if (!response.ok)
-    throw new Error(data.error || "The request could not be completed.");
+    throw Object.assign(
+      new Error(data.error || "The request could not be completed."),
+      { status: response.status },
+    );
   return data;
 }
 function notice(message, bad = false) {
@@ -48,15 +51,19 @@ function shell() {
   $("account").addEventListener("click", accountDialog);
 }
 function connectionForm() {
+  stopRomMSignIn(true);
   $("main").innerHTML =
     '<section class="connect"><h1>Connect your games</h1><p>Connect this Silo profile to your RomM account to browse your collection and keep saved progress with you.</p>' +
     (!library.connection.configured
       ? '<div class="empty"><h2>RomM needs a server address</h2><p>Ask your Silo administrator to set the RomM server address in this plugin’s settings.</p></div>'
-      : '<form id="connect-form"><label for="token">RomM client token</label><input id="token" name="token" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your client token"><div class="or">or use a pairing code</div><label for="pair-code">Pairing code</label><input id="pair-code" name="code" autocomplete="off" spellcheck="false" maxlength="100"><p class="help">Create a client token in RomM with access to your profile, games, platforms, collections, firmware, and read/write game assets. Only your account’s permissions apply.</p><button class="primary" type="submit">Connect account</button><p id="connect-error" role="alert"></p></form>') +
+      : '<div class="browser-sign-in"><button type="button" class="primary" id="romm-sign-in">Sign in to RomM</button><p class="help">Sign in with your RomM account or SSO, then approve Silo Games. This connection is saved for your current Silo profile.</p><div id="romm-sign-in-progress" role="status" aria-live="polite"></div></div><details class="manual-connection"><summary>Use a token or pairing code</summary><form id="connect-form"><label for="token">RomM client token</label><input id="token" name="token" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your client token"><div class="or">or use a pairing code</div><label for="pair-code">Pairing code</label><input id="pair-code" name="code" autocomplete="off" spellcheck="false" maxlength="100"><p class="help">Create a client token in RomM with access to your profile, games, platforms, collections, firmware, and read/write game assets. Only your account’s permissions apply.</p><button class="primary" type="submit">Connect account</button><p id="connect-error" role="alert"></p></form></details>') +
     '<p class="help">Browser play: NES · SNES · Game Boy · Game Boy Color · Game Boy Advance<br>No games or BIOS files are included.</p></section>';
+  if ($("romm-sign-in"))
+    $("romm-sign-in").addEventListener("click", beginRomMSignIn);
   if ($("connect-form"))
     $("connect-form").addEventListener("submit", async (event) => {
       event.preventDefault();
+      stopRomMSignIn(true);
       const form = event.currentTarget,
         button = form.querySelector("button");
       button.disabled = true;
@@ -74,6 +81,120 @@ function connectionForm() {
         button.disabled = false;
       }
     });
+}
+const rommSignIn = { generation: 0, flow: null, timer: null };
+function stopRomMSignIn(cancelRemote = false) {
+  rommSignIn.generation++;
+  if (rommSignIn.timer) clearTimeout(rommSignIn.timer);
+  rommSignIn.timer = null;
+  const old = rommSignIn.flow;
+  rommSignIn.flow = null;
+  if (cancelRemote && old)
+    api("sign-in/cancel", { body: { id: old.id } }).catch(() => {});
+}
+function signInMessage(text) {
+  const root = $("romm-sign-in-progress");
+  if (root) root.textContent = text;
+}
+async function finishRomMSignIn(connection) {
+  stopRomMSignIn();
+  library.connection = connection;
+  await loadLibrary();
+  notice(
+    "Connected to RomM as " +
+      (connection.identity.username || "your account") +
+      ".",
+  );
+}
+async function beginRomMSignIn() {
+  stopRomMSignIn(true);
+  const generation = rommSignIn.generation;
+  const button = $("romm-sign-in");
+  button.disabled = true;
+  // Opening synchronously preserves browser user activation. A visible link
+  // remains available when popup blocking or a controller prevents opening it.
+  const popup = window.open("about:blank", "_blank");
+  if (popup) popup.opener = null;
+  signInMessage("Preparing RomM sign-in…");
+  try {
+    const flow = await api("sign-in/start", { body: {} });
+    if (generation !== rommSignIn.generation) {
+      if (popup) popup.close();
+      api("sign-in/cancel", { body: { id: flow.id } }).catch(() => {});
+      return;
+    }
+    rommSignIn.flow = flow;
+    const root = $("romm-sign-in-progress");
+    if (!root) return;
+    root.innerHTML =
+      '<p>Approve <strong>Silo Games</strong> in RomM. Check that the code matches:</p><code class="approval-code">' +
+      esc(flow.userCode) +
+      '</code><p><a class="approval-link" href="' +
+      esc(flow.verificationUrl) +
+      '" target="_blank" rel="noopener noreferrer">Continue to RomM <span class="sr-only">(opens a new tab)</span></a></p><p class="help">Keep this page open. You will connect automatically after approval.</p><p id="romm-approval-message"></p><button type="button" id="romm-sign-in-cancel">Cancel sign-in</button>';
+    $("romm-sign-in-cancel").onclick = async () => {
+      const id = flow.id;
+      stopRomMSignIn();
+      const cancelledGeneration = rommSignIn.generation;
+      try {
+        const result = await api("sign-in/cancel", { body: { id } });
+        if (cancelledGeneration !== rommSignIn.generation) return;
+        if (result.status === "complete") {
+          await finishRomMSignIn(result.connection);
+          return;
+        }
+      } catch {}
+      if (cancelledGeneration !== rommSignIn.generation) return;
+      signInMessage("Sign-in cancelled. You can try again.");
+      button.disabled = false;
+      button.focus();
+    };
+    if (popup && !popup.closed) popup.location.replace(flow.verificationUrl);
+    pollRomMSignIn(generation);
+  } catch (error) {
+    if (popup && !popup.closed) popup.close();
+    if (generation !== rommSignIn.generation) return;
+    signInMessage(error.message);
+    button.disabled = false;
+  }
+}
+async function pollRomMSignIn(generation) {
+  if (generation !== rommSignIn.generation || !rommSignIn.flow) return;
+  const flow = rommSignIn.flow;
+  try {
+    const result = await api("sign-in/poll", { body: { id: flow.id } });
+    if (generation !== rommSignIn.generation) return;
+    if (result.status === "complete") {
+      await finishRomMSignIn(result.connection);
+      return;
+    }
+    if (result.status !== "pending") {
+      stopRomMSignIn();
+      signInMessage(result.message || "Sign-in ended. Start again.");
+      if ($("romm-sign-in")) $("romm-sign-in").disabled = false;
+      return;
+    }
+    flow.interval = result.interval;
+    const message = result.message || "Waiting for your approval…";
+    const status = $("romm-approval-message");
+    if (status && status.textContent !== message) status.textContent = message;
+  } catch (error) {
+    if (generation !== rommSignIn.generation) return;
+    if (error.status === 409 || error.status === 401) {
+      stopRomMSignIn();
+      signInMessage("This sign-in is no longer active. Start again.");
+      if ($("romm-sign-in")) $("romm-sign-in").disabled = false;
+      return;
+    }
+    if ($("romm-approval-message"))
+      $("romm-approval-message").textContent =
+        "Connection interrupted. Retrying…";
+  }
+  if (generation === rommSignIn.generation)
+    rommSignIn.timer = setTimeout(
+      () => pollRomMSignIn(generation),
+      Math.max(1, flow.interval || 5) * 1000,
+    );
 }
 async function accountDialog() {
   const conn = await api("connection");

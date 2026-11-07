@@ -21,9 +21,61 @@ fs.mkdirSync(shots, { recursive: true });
         errors.push(e.stack || e.message);
     });
     await page.goto(root + "/romm");
-    if (await page.locator("#token").count()) {
-      await page.locator("#token").fill("development-fixture-token");
-      await page.getByRole("button", { name: "Connect account" }).click();
+    if (await page.locator("#romm-sign-in").count()) {
+      await page.screenshot({
+        path: shots + "/connect-desktop.png",
+        fullPage: true,
+      });
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.screenshot({
+        path: shots + "/connect-mobile.png",
+        fullPage: true,
+      });
+      assert(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      );
+      await page.setViewportSize({ width: 1440, height: 1000 });
+      async function startApproval() {
+        const opened = page.waitForEvent("popup");
+        await page
+          .getByRole("button", { name: "Sign in to RomM", exact: true })
+          .click();
+        const popup = await opened;
+        await popup
+          .getByRole("button", { name: "Approve Silo Games" })
+          .waitFor();
+        return popup;
+      }
+      const cancelled = await startApproval();
+      await page.screenshot({
+        path: shots + "/approval-desktop.png",
+        fullPage: true,
+      });
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.screenshot({
+        path: shots + "/approval-mobile.png",
+        fullPage: true,
+      });
+      await page
+        .getByRole("button", { name: "Cancel sign-in", exact: true })
+        .click();
+      await page.getByText("Sign-in cancelled. You can try again.").waitFor();
+      await cancelled.close();
+      const declined = await startApproval();
+      await declined.getByRole("button", { name: "Decline access" }).click();
+      await page
+        .getByText("RomM access was declined. You can try again.")
+        .waitFor();
+      await declined.close();
+      const approval = await startApproval();
+      await approval
+        .getByRole("button", { name: "Approve Silo Games" })
+        .click();
+      await page.locator(".game-card").waitFor();
+      await approval.close();
+      await page.setViewportSize({ width: 1440, height: 1000 });
     }
     await page.locator(".game-card").waitFor();
     await page.locator(".game-card").focus();
@@ -184,7 +236,7 @@ fs.mkdirSync(shots, { recursive: true });
     );
     assert.deepEqual(errors, []);
     console.log(
-      "PASS: browse, mobile/light layout, emulator boot, isolated storage, save, resume, failed-sync outbox and retry",
+      "PASS: browser sign-in approval/cancel/decline, browse, mobile/light layout, emulator boot, isolated storage, save, resume, failed-sync outbox and retry",
     );
   } finally {
     await browser.close();

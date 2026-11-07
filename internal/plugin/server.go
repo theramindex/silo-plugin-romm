@@ -120,6 +120,24 @@ func (s *Server) Handle(ctx context.Context, r *pluginv1.HandleHTTPRequest) (*pl
 	}
 	var out any
 	switch {
+	case p == "/romm/api/sign-in/start" && method == "POST":
+		var in struct{}
+		err = decode(r, &in)
+		if err == nil {
+			out, err = s.Engine.StartSignIn(ctx, own)
+		}
+	case (p == "/romm/api/sign-in/poll" || p == "/romm/api/sign-in/cancel") && method == "POST":
+		var in struct {
+			ID string `json:"id"`
+		}
+		err = decode(r, &in)
+		if err == nil {
+			if p == "/romm/api/sign-in/poll" {
+				out, err = s.Engine.PollSignIn(ctx, own, in.ID)
+			} else {
+				out, err = s.Engine.CancelSignIn(own, in.ID)
+			}
+		}
 	case p == "/romm/api/connection" && method == "GET":
 		out = s.Engine.Status(own)
 	case p == "/romm/api/link" && method == "POST":

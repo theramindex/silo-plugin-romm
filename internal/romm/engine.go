@@ -45,6 +45,7 @@ type Connection struct {
 	Namespace  string   `json:"namespace"`
 }
 type Engine struct {
+	approvals map[string]*deviceApproval
 	mu        sync.RWMutex
 	dir, base string
 	links     map[string]Link
@@ -123,6 +124,7 @@ func (e *Engine) Configure(raw string) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	if e.base != raw {
+		e.approvals = map[string]*deviceApproval{}
 		e.sessions = map[string]Session{}
 		e.uploads = map[string]*Upload{}
 	}
@@ -209,18 +211,33 @@ func (e *Engine) Link(ctx context.Context, owner, token, code string) (Connectio
 	if len(token) < 8 || len(token) > 8192 || strings.ContainsAny(token, "\r\n") {
 		return Connection{}, errors.New("Enter a valid RomM client token or pairing code")
 	}
-	var identity Identity
-	if err := e.request(ctx, base, token, http.MethodGet, "/api/users/me", nil, "", &identity); err != nil {
+	identity, err := e.verifyIdentity(ctx, base, token)
+	if err != nil {
 		return Connection{}, err
-	}
-	if identity.ID <= 0 {
-		return Connection{}, errors.New("RomM did not return a valid user identity")
 	}
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	if base != e.base {
 		return Connection{}, ErrChanged
 	}
+	return e.saveLinkLocked(owner, base, token, identity)
+}
+func (e *Engine) verifyIdentity(ctx context.Context, base, token string) (Identity, error) {
+	var identity Identity
+	if len(token) < 8 || len(token) > 8192 || strings.ContainsAny(token, "\r\n") {
+		return identity, errors.New("Invalid RomM authorization token")
+	}
+	if err := e.request(ctx, base, token, http.MethodGet, "/api/users/me", nil, "", &identity); err != nil {
+		return identity, err
+	}
+	if identity.ID <= 0 {
+		return identity, errors.New("RomM did not return a valid user identity")
+	}
+	return identity, nil
+}
+
+// Caller holds e.mu; only verified identities may be persisted here.
+func (e *Engine) saveLinkLocked(owner, base, token string, identity Identity) (Connection, error) {
 	nonce := make([]byte, e.aead.NonceSize())
 	if _, err := rand.Read(nonce); err != nil {
 		return Connection{}, err
@@ -237,6 +254,7 @@ func (e *Engine) Link(ctx context.Context, owner, token, code string) (Connectio
 		}
 		return Connection{}, errors.New("Could not save the account connection")
 	}
+	e.cancelOwnerApprovalsLocked(owner)
 	return Connection{Linked: true, Configured: true, Identity: identity, Generation: l.Generation, Namespace: l.Generation}, nil
 }
 func (e *Engine) Unlink(owner string) error {
@@ -250,6 +268,7 @@ func (e *Engine) Unlink(owner string) error {
 		}
 		return errors.New("Could not remove account connection")
 	}
+	e.cancelOwnerApprovalsLocked(owner)
 	return nil
 }
 func (e *Engine) request(ctx context.Context, base, token, method, path string, body io.Reader, contentType string, out any) error {
