@@ -1,0 +1,296 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-06T20:44:05.695937+00:00",
+  "title": "Design System: RomM for Silo",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Primary action",
+        "tonalRamp": [
+          "oklch(15% 0.006 285)",
+          "oklch(25% 0.006 285)",
+          "oklch(35% 0.006 285)",
+          "oklch(45% 0.006 285)",
+          "oklch(60% 0.006 285)",
+          "oklch(72% 0.006 285)",
+          "oklch(85% 0.006 285)",
+          "oklch(95% 0.006 285)"
+        ]
+      },
+      "on-primary": {
+        "role": "neutral",
+        "displayName": "Primary action foreground",
+        "tonalRamp": [
+          "oklch(15% 0.006 285)",
+          "oklch(25% 0.006 285)",
+          "oklch(35% 0.006 285)",
+          "oklch(45% 0.006 285)",
+          "oklch(60% 0.006 285)",
+          "oklch(72% 0.006 285)",
+          "oklch(85% 0.006 285)",
+          "oklch(95% 0.006 285)"
+        ]
+      },
+      "background": {
+        "role": "neutral",
+        "displayName": "Page ground",
+        "tonalRamp": [
+          "oklch(15% 0.006 285)",
+          "oklch(25% 0.006 285)",
+          "oklch(35% 0.006 285)",
+          "oklch(45% 0.006 285)",
+          "oklch(60% 0.006 285)",
+          "oklch(72% 0.006 285)",
+          "oklch(85% 0.006 285)",
+          "oklch(95% 0.006 285)"
+        ]
+      },
+      "navigation": {
+        "role": "neutral",
+        "displayName": "Navigation ground",
+        "tonalRamp": [
+          "oklch(15% 0.006 285)",
+          "oklch(25% 0.006 285)",
+          "oklch(35% 0.006 285)",
+          "oklch(45% 0.006 285)",
+          "oklch(60% 0.006 285)",
+          "oklch(72% 0.006 285)",
+          "oklch(85% 0.006 285)",
+          "oklch(95% 0.006 285)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Control surface",
+        "tonalRamp": [
+          "oklch(15% 0.006 285)",
+          "oklch(25% 0.006 285)",
+          "oklch(35% 0.006 285)",
+          "oklch(45% 0.006 285)",
+          "oklch(60% 0.006 285)",
+          "oklch(72% 0.006 285)",
+          "oklch(85% 0.006 285)",
+          "oklch(95% 0.006 285)"
+        ]
+      },
+      "surface-raised": {
+        "role": "neutral",
+        "displayName": "Raised surface",
+        "tonalRamp": [
+          "oklch(15% 0.006 285)",
+          "oklch(25% 0.006 285)",
+          "oklch(35% 0.006 285)",
+          "oklch(45% 0.006 285)",
+          "oklch(60% 0.006 285)",
+          "oklch(72% 0.006 285)",
+          "oklch(85% 0.006 285)",
+          "oklch(95% 0.006 285)"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Boundary",
+        "tonalRamp": [
+          "oklch(15% 0.006 285)",
+          "oklch(25% 0.006 285)",
+          "oklch(35% 0.006 285)",
+          "oklch(45% 0.006 285)",
+          "oklch(60% 0.006 285)",
+          "oklch(72% 0.006 285)",
+          "oklch(85% 0.006 285)",
+          "oklch(95% 0.006 285)"
+        ]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Main text",
+        "tonalRamp": [
+          "oklch(15% 0.006 285)",
+          "oklch(25% 0.006 285)",
+          "oklch(35% 0.006 285)",
+          "oklch(45% 0.006 285)",
+          "oklch(60% 0.006 285)",
+          "oklch(72% 0.006 285)",
+          "oklch(85% 0.006 285)",
+          "oklch(95% 0.006 285)"
+        ]
+      },
+      "text-muted": {
+        "role": "neutral",
+        "displayName": "Supporting text",
+        "tonalRamp": [
+          "oklch(15% 0.006 285)",
+          "oklch(25% 0.006 285)",
+          "oklch(35% 0.006 285)",
+          "oklch(45% 0.006 285)",
+          "oklch(60% 0.006 285)",
+          "oklch(72% 0.006 285)",
+          "oklch(85% 0.006 285)",
+          "oklch(95% 0.006 285)"
+        ]
+      },
+      "danger": {
+        "role": "secondary",
+        "displayName": "Error and disconnect",
+        "tonalRamp": [
+          "oklch(15% 0.09 20)",
+          "oklch(25% 0.09 20)",
+          "oklch(35% 0.09 20)",
+          "oklch(45% 0.09 20)",
+          "oklch(60% 0.09 20)",
+          "oklch(72% 0.09 20)",
+          "oklch(85% 0.09 20)",
+          "oklch(95% 0.09 20)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Page heading",
+        "purpose": "Responsive library and account-connection headings."
+      },
+      "title": {
+        "displayName": "Dialog title",
+        "purpose": "Named dialogs and game-detail titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Content and inherited control text."
+      },
+      "label": {
+        "displayName": "Field label",
+        "purpose": "Persistent form labels."
+      },
+      "card-title": {
+        "displayName": "Game title",
+        "purpose": "Wrapping names beneath covers."
+      }
+    },
+    "shadows": [
+      {
+        "name": "notice",
+        "value": "0 8px 32px #0005",
+        "purpose": "Separates transient notices from the current surface."
+      }
+    ],
+    "motion": [
+      {
+        "name": "cover-hover",
+        "value": "transform 140ms ease; translateY(-3px)",
+        "purpose": "Small cover lift, only without a reduced-motion preference."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "compact",
+        "value": "720px"
+      },
+      {
+        "name": "narrow",
+        "value": "400px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The principal action in a form or dialog.",
+      "html": "<button class=\"ds-primary\">Connect account</button>",
+      "css": ".ds-primary{font-family:var(--font-body, \"Plus Jakarta Sans\", ui-sans-serif, system-ui, sans-serif);font-size:16px;font-weight:650;padding:10px 15px;border:1px solid var(--border,#28282e);border-radius:8px;background:var(--accent,#e8e8ec);color:var(--on-accent,#141417);cursor:pointer}.ds-primary:hover{background:var(--accent,#e8e8ec)}.ds-primary:focus-visible{outline:3px solid var(--accent,#e8e8ec);outline-offset:4px}.ds-primary:disabled{opacity:.55;cursor:wait}"
+    },
+    {
+      "name": "Secondary button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Ordinary navigation and supporting actions.",
+      "html": "<button class=\"ds-secondary\">Save progress</button>",
+      "css": ".ds-secondary{font-family:var(--font-body, \"Plus Jakarta Sans\", ui-sans-serif, system-ui, sans-serif);font-size:16px;padding:10px 15px;border:1px solid var(--border,#28282e);border-radius:8px;background:var(--panel,#1c1c20);color:var(--text,#e8e8ec);cursor:pointer}.ds-secondary:hover{background:var(--panel-2,#232328)}.ds-secondary:focus-visible{outline:3px solid var(--accent,#e8e8ec);outline-offset:4px}.ds-secondary:disabled{opacity:.55;cursor:wait}"
+    },
+    {
+      "name": "Labeled search field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Persistent labels accompany search and account fields.",
+      "html": "<label class=\"ds-field\">Search games<input type=\"search\" placeholder=\"Search your collection\"></label>",
+      "css": ".ds-field{display:flex;flex-direction:column;gap:9px;color:var(--text,#e8e8ec);font-family:var(--font-body, \"Plus Jakarta Sans\", ui-sans-serif, system-ui, sans-serif);font-size:13px;font-weight:600}.ds-field input{font:inherit;font-size:16px;color:inherit;background:var(--panel,#1c1c20);border:1px solid var(--border,#28282e);border-radius:8px;padding:12px;min-width:0}.ds-field input:focus-visible{outline:3px solid var(--accent,#e8e8ec);outline-offset:4px}"
+    },
+    {
+      "name": "Platform select",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Labeled native filtering with the same field geometry.",
+      "html": "<label class=\"ds-select\">Platform<select><option>All platforms</option><option>Game Boy</option></select></label>",
+      "css": ".ds-select{display:flex;flex-direction:column;gap:9px;color:var(--text,#e8e8ec);font-family:var(--font-body, \"Plus Jakarta Sans\", ui-sans-serif, system-ui, sans-serif);font-size:13px;font-weight:600}.ds-select select{font:inherit;font-size:16px;color:inherit;background:var(--panel,#1c1c20);border:1px solid var(--border,#28282e);border-radius:8px;padding:12px}.ds-select select:focus-visible{outline:3px solid var(--accent,#e8e8ec);outline-offset:4px}"
+    },
+    {
+      "name": "Game card",
+      "kind": "card",
+      "refersTo": "cover",
+      "description": "A portrait cover and compact title form one interactive target.",
+      "html": "<button class=\"ds-card\"><span class=\"ds-cover\">G</span><strong>Game title</strong><span class=\"ds-platform\">Game Boy</span></button>",
+      "css": ".ds-card{display:flex;flex-direction:column;gap:6px;width:165px;padding:0;text-align:left;border:0;background:none;color:var(--text,#e8e8ec);font-family:var(--font-body, \"Plus Jakarta Sans\", ui-sans-serif, system-ui, sans-serif);cursor:pointer}.ds-cover{display:grid;place-items:center;aspect-ratio:3/4;width:100%;border:1px solid var(--border,#28282e);border-radius:10px;background:var(--panel-2,#232328);color:var(--muted,#a4a4ae);font-size:56px;overflow:hidden;margin-bottom:5px}.ds-card strong{font-size:14px;line-height:1.4;overflow-wrap:anywhere}.ds-platform{font-size:12px;color:var(--muted,#a4a4ae)}.ds-card:focus-visible{outline:3px solid var(--accent,#e8e8ec);outline-offset:7px}@media(prefers-reduced-motion:no-preference){.ds-cover{transition:transform 140ms ease}.ds-card:hover .ds-cover{transform:translateY(-3px)}}"
+    },
+    {
+      "name": "Application navigation",
+      "kind": "nav",
+      "description": "A compact family header separates context from account access.",
+      "html": "<header class=\"ds-nav\"><a href=\"#\">Silo</a><span class=\"ds-divider\"></span><strong>Games</strong><button>Account</button></header>",
+      "css": ".ds-nav{display:flex;align-items:center;gap:20px;min-height:76px;padding:16px 32px;border-bottom:1px solid var(--border,#28282e);background:var(--rail,#0f0f12);color:var(--text,#e8e8ec);font-family:var(--font-body, \"Plus Jakarta Sans\", ui-sans-serif, system-ui, sans-serif)}.ds-nav a{font-size:20px;font-weight:750;text-decoration:none;color:inherit}.ds-divider{height:22px;width:1px;background:var(--border,#28282e)}.ds-nav button{margin-left:auto;font:inherit;padding:10px 15px;border:1px solid var(--border,#28282e);border-radius:8px;background:var(--panel,#1c1c20);color:inherit;cursor:pointer}.ds-nav button:hover{background:var(--panel-2,#232328)}.ds-nav button:focus-visible{outline:3px solid var(--accent,#e8e8ec);outline-offset:4px}.ds-nav a:focus-visible{outline:3px solid var(--accent,#e8e8ec);outline-offset:4px}@media(max-width:720px){.ds-nav{padding:14px 18px;gap:12px}}"
+    },
+    {
+      "name": "Controller choices",
+      "kind": "custom",
+      "description": "Stacked choices make filtering operable without a native select popup.",
+      "html": "<div class=\"ds-choices\"><button aria-pressed=\"false\">All platforms</button><button aria-pressed=\"true\">Game Boy</button></div>",
+      "css": ".ds-choices{display:flex;flex-direction:column;gap:8px;font-family:var(--font-body, \"Plus Jakarta Sans\", ui-sans-serif, system-ui, sans-serif)}.ds-choices button{font:inherit;text-align:left;min-height:44px;padding:10px 15px;border:1px solid var(--border,#28282e);border-radius:8px;background:var(--panel,#1c1c20);color:var(--text,#e8e8ec);cursor:pointer}.ds-choices button:hover{background:var(--panel-2,#232328)}.ds-choices button[aria-pressed=true]{background:var(--text,#e8e8ec);color:var(--panel,#1c1c20)}.ds-choices button:focus-visible{outline:3px solid var(--accent,#e8e8ec);outline-offset:4px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Silo Library",
+    "overview": "RomM uses the existing Silo plugin family's operational visual language. The\ninterface is quiet, compact and content-led: game covers and titles supply its\nidentity, while the surrounding controls remain familiar across the library,\naccount forms and player.\n\nDark and light surfaces share the same geometry. Clear labels, visible focus\nand explicit state text support touch, keyboard and controller use. The player\nretains this control language while giving the game the remaining viewport.",
+    "keyCharacteristics": [
+      "Semantic Silo colors with coherent dark and light fallbacks.",
+      "One bundled type family for headings, content and controls.",
+      "Cover-led grids and compact, labeled fields.",
+      "Neutral selected controls, named dialogs and explicit progress status."
+    ],
+    "rules": [
+      {
+        "name": "The Theme Alias Rule",
+        "body": "Reuse the existing semantic aliases so foreground, background and borders change as a coherent theme.",
+        "section": "colors"
+      },
+      {
+        "name": "The Inverted Selection Rule",
+        "body": "A selected controller choice uses the text color as its background and the surface color as its foreground. Selection is also expressed through `aria-pressed`.",
+        "section": "colors"
+      },
+      {
+        "name": "The Title First Rule",
+        "body": "In a game detail, the title precedes normal platform metadata. Platform information is not an uppercase kicker above the heading.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Control Rule",
+        "body": "Preserve tonal hover states and the visible focus outline; ordinary buttons do not need ornamental shadows.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use Silo's semantic color aliases and its bundled font family.",
+      "Do keep covers portrait, titles wrapping and metadata below the title.",
+      "Do preserve explicit labels, named dialogs and visible keyboard focus.",
+      "Do use neutral inversion together with a semantic selected state.",
+      "Do keep the game stage dominant and progress text visible."
+    ],
+    "donts": [
+      "Don't introduce a competing decorative palette or display face.",
+      "Don't use a glyph in place of the established text close control.",
+      "Don't promote platform metadata into an uppercase eyebrow.",
+      "Don't communicate error, selection or pending progress through color alone."
+    ]
+  }
+}

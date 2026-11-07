@@ -1,0 +1,3 @@
+# Keep upstream assets byte-for-byte, including their original whitespace.
+internal/plugin/emulator/** linguist-vendored -whitespace
+internal/plugin/ui/OFL.txt -whitespace

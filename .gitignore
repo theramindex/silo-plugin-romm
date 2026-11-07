@@ -1,0 +1,4 @@
+/dist/
+/.tmp-*
+/.impeccable/review/
+.DS_Store

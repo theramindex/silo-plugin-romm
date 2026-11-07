@@ -1,0 +1,633 @@
+{
+  "plugin_id": "silo.ramindex.romm",
+  "version": "0.1.0",
+  "checksum": "__CHECKSUM__",
+  "silo_api_version": "v1",
+  "supported_platforms": [
+    {
+      "os": "darwin",
+      "arch": "arm64"
+    },
+    {
+      "os": "linux",
+      "arch": "amd64"
+    },
+    {
+      "os": "linux",
+      "arch": "arm64"
+    }
+  ],
+  "capabilities": [
+    {
+      "type": "http_routes.v1",
+      "id": "romm-routes",
+      "display_name": "RomM for Silo",
+      "description": "Browse RomM and play classic games with profile-specific account links and saved progress."
+    }
+  ],
+  "http_routes": [
+    {
+      "id": "romm-0",
+      "method": "GET",
+      "path": "/romm",
+      "access": "authenticated",
+      "navigable": true,
+      "navigation_label": "Games",
+      "navigation_kind": "user"
+    },
+    {
+      "id": "romm-1",
+      "method": "GET",
+      "path": "/romm/",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-2",
+      "method": "GET",
+      "path": "/romm/play",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-3",
+      "method": "GET",
+      "path": "/romm/api/connection",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-4",
+      "method": "GET",
+      "path": "/romm/api/platforms",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-5",
+      "method": "GET",
+      "path": "/romm/api/collections",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-6",
+      "method": "GET",
+      "path": "/romm/api/games",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-7",
+      "method": "GET",
+      "path": "/romm/api/game",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-8",
+      "method": "GET",
+      "path": "/romm/api/session",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-9",
+      "method": "GET",
+      "path": "/romm/api/content",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-10",
+      "method": "GET",
+      "path": "/romm/api/art",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-11",
+      "method": "POST",
+      "path": "/romm/api/link",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-12",
+      "method": "POST",
+      "path": "/romm/api/unlink",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-13",
+      "method": "POST",
+      "path": "/romm/api/play",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-14",
+      "method": "POST",
+      "path": "/romm/api/stop",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-15",
+      "method": "POST",
+      "path": "/romm/api/upload",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-16",
+      "method": "GET",
+      "path": "/romm/assets/app.css",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-17",
+      "method": "GET",
+      "path": "/romm/assets/plus-jakarta-sans-cyrillic-ext-wght-normal.woff2",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-18",
+      "method": "GET",
+      "path": "/romm/assets/plus-jakarta-sans-latin-ext-wght-normal.woff2",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-19",
+      "method": "GET",
+      "path": "/romm/assets/plus-jakarta-sans-latin-wght-normal.woff2",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-20",
+      "method": "GET",
+      "path": "/romm/assets/plus-jakarta-sans-vietnamese-wght-normal.woff2",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-21",
+      "method": "GET",
+      "path": "/romm/assets/theme.js",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-22",
+      "method": "GET",
+      "path": "/romm/assets/emulator/LICENSE",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-23",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/compression/README.md",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-24",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/compression/extract7z.js",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-25",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/compression/extractzip.js",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-26",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/compression/libunrar.js",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-27",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/compression/libunrar.wasm",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-28",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/core-README.md",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-29",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/cores.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-30",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/fceumm-wasm.data",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-31",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/gambatte-wasm.data",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-32",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mgba-wasm.data",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-33",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/fceumm.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-34",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/gambatte.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-35",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/mgba.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-36",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/snes9x.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-37",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/snes9x-wasm.data",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-38",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/emulator.css",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-39",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/emulator.min.css",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-40",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/emulator.min.js",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-41",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/loader.js",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-42",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/localization/README.md",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-43",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/localization/af-FR.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-44",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/localization/ar-AR.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-45",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/localization/ben-BEN.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-46",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/localization/de-GER.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-47",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/localization/el-GR.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-48",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/localization/en-US.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-49",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/localization/es-ES.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-50",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/localization/fa-AF.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-51",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/localization/hi-HI.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-52",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/localization/it-IT.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-53",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/localization/ja-JA.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-54",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/localization/jv-JV.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-55",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/localization/ko-KO.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-56",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/localization/pt-BR.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-57",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/localization/retroarch.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-58",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/localization/ro-RO.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-59",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/localization/ru-RU.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-60",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/localization/tr-TR.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-61",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/localization/vi-VN.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-62",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/localization/zh-CN.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-63",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/src/GameManager.js",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-64",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/src/compression.js",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-65",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/src/emulator.js",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-66",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/src/gamepad.js",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-67",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/src/nipplejs.js",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-68",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/src/shaders.js",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-69",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/src/socket.io.min.js",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-70",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/src/storage.js",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-71",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/version.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-72",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/fceumm-legacy-wasm.data",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-73",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/gambatte-legacy-wasm.data",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-74",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mgba-legacy-wasm.data",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-75",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/snes9x-legacy-wasm.data",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-76",
+      "method": "GET",
+      "path": "/romm/assets/OFL.txt",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-77",
+      "method": "GET",
+      "path": "/romm/assets/app.js",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-78",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/gambatte-libretro-COPYING",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-79",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/libretro-fceumm-Copying",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-80",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/mgba-LICENSE",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-81",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/snes9x-LICENSE",
+      "access": "authenticated",
+      "navigable": false
+    }
+  ],
+  "global_config_schema": [
+    {
+      "key": "connection",
+      "title": "RomM server",
+      "description": "Set the address of your RomM server.",
+      "json_schema": "{\"type\": \"object\", \"properties\": {\"url\": {\"type\": \"string\", \"title\": \"RomM server address\", \"description\": \"HTTP or HTTPS base URL reachable from Silo. Each viewer connects their own RomM account in Games.\"}}, \"additionalProperties\": false}",
+      "required": false
+    }
+  ],
+  "metadata": {
+    "display_name": "RomM for Silo",
+    "summary": "Your RomM collection, with browser play and personal saves."
+  },
+  "presentation": {
+    "display_name": "RomM for Silo",
+    "summary": "Your RomM collection, with browser play and personal saves.",
+    "description_markdown": "Browse platforms, collections and games from RomM. Connect each Silo profile to its own RomM account, then play NES, SNES, GB, GBC and GBA games using locally bundled EmulatorJS. Requires the Ramindex Silo loopback relay. No ROMs or BIOS are included.",
+    "setup_markdown": "Set the RomM server URL in plugin settings. Open Games and connect a scoped RomM client token or pairing code. Keep the plugin data directory on persistent storage.",
+    "homepage_url": "https://github.com/theramindex/silo-plugin-romm",
+    "source_url": "https://github.com/theramindex/silo-plugin-romm",
+    "support_url": "https://github.com/theramindex/silo-plugin-romm/issues",
+    "changelog_url": "https://github.com/theramindex/silo-plugin-romm/releases",
+    "publisher_name": "Ramindex",
+    "publisher_url": "https://github.com/theramindex",
+    "license_spdx": "GPL-3.0-only"
+  },
+  "category": "Games"
+}

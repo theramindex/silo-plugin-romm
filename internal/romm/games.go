@@ -1,0 +1,316 @@
+package romm
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"io"
+	"net/http"
+	"net/url"
+	"path"
+	"strconv"
+	"strings"
+	"time"
+)
+
+const EmulatorVersion = "emulatorjs-4.2.3"
+
+type Platform struct {
+	ID    int64  `json:"id"`
+	Name  string `json:"name"`
+	Slug  string `json:"slug"`
+	Count int    `json:"rom_count"`
+}
+type Collection struct {
+	ID    int64  `json:"id"`
+	Name  string `json:"name"`
+	Count int    `json:"rom_count"`
+}
+type Game struct {
+	ID             int64  `json:"id"`
+	Name           string `json:"name"`
+	Summary        string `json:"summary"`
+	PlatformID     int64  `json:"platform_id"`
+	PlatformSlug   string `json:"platform_slug"`
+	Platform       string `json:"platform_display_name"`
+	Filename       string `json:"fs_name"`
+	LegacyFilename string `json:"file_name,omitempty"`
+	Cover          string `json:"path_cover_small"`
+	LargeCover     string `json:"path_cover_large"`
+	Size           int64  `json:"fs_size_bytes"`
+	Core           string `json:"core"`
+}
+type Page struct {
+	Items  []Game `json:"items"`
+	Total  int    `json:"total"`
+	Limit  int    `json:"limit"`
+	Offset int    `json:"offset"`
+}
+
+func Core(slug string) string {
+	switch strings.ToLower(slug) {
+	case "nes", "famicom":
+		return "fceumm"
+	case "snes", "super-famicom":
+		return "snes9x"
+	case "gb", "gbc", "game-boy", "game-boy-color":
+		return "gambatte"
+	case "gba", "game-boy-advance":
+		return "mgba"
+	}
+	return ""
+}
+func (e *Engine) Platforms(ctx context.Context, owner string) ([]Platform, error) {
+	var out []Platform
+	err := e.JSON(ctx, owner, "/api/platforms", &out)
+	return out, err
+}
+func (e *Engine) Collections(ctx context.Context, owner string) ([]Collection, error) {
+	var out []Collection
+	err := e.JSON(ctx, owner, "/api/collections", &out)
+	return out, err
+}
+func (e *Engine) Games(ctx context.Context, owner, search, platform, collection, offset string) (Page, error) {
+	q := url.Values{"limit": {"48"}, "with_rom_id_index": {"false"}, "with_filter_values": {"false"}}
+	if len(search) > 200 {
+		search = search[:200]
+	}
+	if search != "" {
+		q.Set("search_term", search)
+	}
+	for key, value := range map[string]string{"platform_ids": platform, "collection_id": collection} {
+		if value != "" {
+			if _, err := ID(value); err != nil {
+				return Page{}, err
+			}
+			q.Set(key, value)
+		}
+	}
+	n, _ := strconv.Atoi(offset)
+	if n < 0 || n > 100000 {
+		n = 0
+	}
+	q.Set("offset", strconv.Itoa(n))
+	var out Page
+	err := e.JSON(ctx, owner, "/api/roms?"+q.Encode(), &out)
+	for i := range out.Items {
+		out.Items[i].Core = Core(out.Items[i].PlatformSlug)
+	}
+	return out, err
+}
+func (e *Engine) Game(ctx context.Context, owner string, id int64) (Game, error) {
+	var g Game
+	err := e.JSON(ctx, owner, fmt.Sprintf("/api/roms/%d", id), &g)
+	if err != nil {
+		return g, err
+	}
+	if g.ID != id {
+		return Game{}, ErrUpstream
+	}
+	if g.Filename == "" {
+		g.Filename = g.LegacyFilename
+	}
+	g.Core = Core(g.PlatformSlug)
+	return g, nil
+}
+
+type Asset struct {
+	ID       int64  `json:"id"`
+	ROM      int64  `json:"rom_id"`
+	User     int64  `json:"user_id"`
+	Emulator string `json:"emulator"`
+	Slot     string `json:"slot"`
+	Updated  string `json:"updated_at"`
+	Filename string `json:"file_name"`
+}
+type Session struct {
+	ID         string    `json:"id"`
+	Owner      string    `json:"-"`
+	Generation string    `json:"generation"`
+	Server     string    `json:"-"`
+	Game       Game      `json:"game"`
+	Emulator   string    `json:"emulator"`
+	Namespace  string    `json:"namespace"`
+	SaveID     int64     `json:"saveId,omitempty"`
+	StateID    int64     `json:"stateId,omitempty"`
+	BIOSID     int64     `json:"biosId,omitempty"`
+	BIOSName   string    `json:"-"`
+	Expires    time.Time `json:"-"`
+}
+
+func (e *Engine) assets(ctx context.Context, owner, kind string, rom int64) ([]Asset, error) {
+	var out []Asset
+	err := e.JSON(ctx, owner, fmt.Sprintf("/api/%s?rom_id=%d", kind, rom), &out)
+	return out, err
+}
+func (e *Engine) Play(ctx context.Context, owner string, id int64) (Session, error) {
+	link, _, err := e.credentials(owner)
+	if err != nil {
+		return Session{}, err
+	}
+	g, err := e.Game(ctx, owner, id)
+	if err != nil {
+		return Session{}, err
+	}
+	if g.Core == "" {
+		return Session{}, errors.New("Browser play currently supports NES, SNES, Game Boy, Game Boy Color and Game Boy Advance")
+	}
+	if g.Size > 64<<20 {
+		return Session{}, errors.New("Browser play supports ROM files up to 64 MiB")
+	}
+	if g.Filename == "" || strings.ContainsAny(g.Filename, "/\\") {
+		return Session{}, errors.New("This game needs a single ROM file for browser play")
+	}
+	s := Session{ID: randomID(), Owner: owner, Generation: link.Generation, Server: link.Server, Game: g, Emulator: g.Core + "-" + EmulatorVersion, Namespace: link.Generation + "-" + strconv.FormatInt(id, 10), Expires: time.Now().Add(6 * time.Hour)}
+	// A failed save lookup must stop launch: starting a fresh game could overwrite
+	// a remote save during a temporary outage or with a read-only token.
+	for _, kind := range []string{"saves", "states"} {
+		assets, err := e.assets(ctx, owner, kind, id)
+		if err != nil {
+			return Session{}, err
+		}
+		var newest Asset
+		for _, a := range assets {
+			if a.ROM == id && a.User == link.Identity.ID && a.Emulator == s.Emulator && a.Updated >= newest.Updated {
+				newest = a
+			}
+		}
+		if kind == "saves" {
+			s.SaveID = newest.ID
+		} else {
+			s.StateID = newest.ID
+		}
+	}
+	// These initial cores work without BIOS, but use a matching installed firmware
+	// when RomM has one. No BIOS or ROM data is bundled with the plugin.
+	var firmware []struct {
+		ID       int64  `json:"id"`
+		Platform int64  `json:"platform_id"`
+		Name     string `json:"file_name"`
+	}
+	if err = e.JSON(ctx, owner, "/api/firmware?platform_id="+strconv.FormatInt(g.PlatformID, 10), &firmware); err != nil {
+		return Session{}, err
+	}
+	names := map[string]string{"gba": "gba_bios.bin", "gb": "gb_bios.bin", "gbc": "gbc_bios.bin"}
+	for _, f := range firmware {
+		if f.Platform == g.PlatformID && names[g.PlatformSlug] != "" && strings.EqualFold(f.Name, names[g.PlatformSlug]) {
+			s.BIOSID = f.ID
+			s.BIOSName = f.Name
+			break
+		}
+	}
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	current, ok := e.links[owner]
+	if !ok || current.Generation != link.Generation || e.base != link.Server {
+		return Session{}, ErrChanged
+	}
+	active := 0
+	for key, old := range e.sessions {
+		if time.Now().After(old.Expires) {
+			delete(e.sessions, key)
+		} else if old.Owner == owner {
+			active++
+		}
+	}
+	if len(e.sessions) >= 128 || active >= 4 {
+		return Session{}, errors.New("Close an existing game before starting another")
+	}
+	e.sessions[s.ID] = s
+	return s, nil
+}
+func (e *Engine) Session(owner, id string) (Session, error) {
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+	s, ok := e.sessions[id]
+	l, linked := e.links[owner]
+	if !ok || s.Owner != owner || !linked || s.Generation != l.Generation || e.base != s.Server || time.Now().After(s.Expires) {
+		return Session{}, ErrChanged
+	}
+	return s, nil
+}
+func (e *Engine) Stop(owner, id string) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	if s, ok := e.sessions[id]; ok && s.Owner == owner {
+		delete(e.sessions, id)
+	}
+}
+func (e *Engine) stream(ctx context.Context, owner, target string) (*http.Response, error) {
+	l, t, err := e.credentials(owner)
+	if err != nil {
+		return nil, err
+	}
+	r, err := http.NewRequestWithContext(ctx, "GET", l.Server+target, nil)
+	if err != nil {
+		return nil, ErrUpstream
+	}
+	r.Header.Set("Authorization", "Bearer "+t)
+	response, err := e.client.Do(r)
+	if err != nil {
+		return nil, ErrUpstream
+	}
+	if response.StatusCode != 200 {
+		response.Body.Close()
+		return nil, ErrUpstream
+	}
+	return response, nil
+}
+func (e *Engine) Content(ctx context.Context, owner, id, kind string) (*http.Response, error) {
+	s, err := e.Session(owner, id)
+	if err != nil {
+		return nil, err
+	}
+	target := ""
+	switch kind {
+	case "rom":
+		target = fmt.Sprintf("/api/roms/%d/content/%s?purpose=play", s.Game.ID, url.PathEscape(s.Game.Filename))
+	case "bios":
+		if s.BIOSID <= 0 {
+			return nil, ErrUpstream
+		}
+		target = fmt.Sprintf("/api/firmware/%d/content/%s", s.BIOSID, url.PathEscape(s.BIOSName))
+	case "saves", "states":
+		a := s.SaveID
+		if kind == "states" {
+			a = s.StateID
+		}
+		if a <= 0 {
+			return nil, errors.New("No compatible saved progress")
+		}
+		target = fmt.Sprintf("/api/%s/%d/content", kind, a)
+	default:
+		return nil, ErrUpstream
+	}
+	return e.stream(ctx, owner, target)
+}
+func (e *Engine) Artwork(ctx context.Context, owner string, id int64) (*http.Response, error) {
+	g, err := e.Game(ctx, owner, id)
+	if err != nil {
+		return nil, err
+	}
+	p := g.LargeCover
+	if p == "" {
+		p = g.Cover
+	}
+	p = "/" + strings.TrimLeft(p, "/")
+	u, err := url.Parse(p)
+	if err != nil || u.RawQuery != "" || u.Fragment != "" || strings.Contains(p, "%") || strings.Contains(p, "..") || !strings.HasPrefix(path.Clean(p), "/assets/romm/") {
+		return nil, ErrUpstream
+	}
+	return e.stream(ctx, owner, p)
+}
+func CopyContent(w http.ResponseWriter, r *http.Response, kind string) {
+	defer r.Body.Close()
+	typ := "application/octet-stream"
+	if kind == "art" {
+		typ = r.Header.Get("Content-Type")
+		if !strings.HasPrefix(typ, "image/") || strings.Contains(typ, "svg") {
+			w.WriteHeader(502)
+			return
+		}
+	}
+	w.Header().Set("Content-Type", typ)
+	w.Header().Set("Cache-Control", "no-store")
+	_, _ = io.Copy(w, r.Body)
+}
