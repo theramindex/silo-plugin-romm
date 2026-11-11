@@ -19,12 +19,22 @@ async function api(name, { query, body, signal } = {}) {
     body: body === undefined ? undefined : JSON.stringify(body),
     signal,
   });
-  const data = await response.json();
+  const data = await response.json().catch((error) => {
+    if (error.name === "AbortError") throw error;
+    return null;
+  });
   if (!response.ok)
     throw Object.assign(
-      new Error(data.error || "The request could not be completed."),
+      new Error(
+        data?.error ||
+          ([502, 503, 504].includes(response.status)
+            ? "Games is temporarily unavailable. Try again or ask your Silo administrator to check the RomM server connection."
+            : "The request could not be completed. Please try again."),
+      ),
       { status: response.status },
     );
+  if (data === null)
+    throw new Error("Games received an invalid response. Please try again.");
   return data;
 }
 function notice(message, bad = false) {
@@ -312,6 +322,7 @@ async function loadGames() {
       signal: library.abort.signal,
     });
     if (gen !== library.generation) return;
+    notice("");
     library.page = page;
     const games = page.items || [];
     $("result-count").textContent =

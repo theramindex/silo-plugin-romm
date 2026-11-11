@@ -69,8 +69,11 @@ func problem(err error) *pluginv1.HandleHTTPResponse {
 	if errors.Is(err, romm.ErrUnlinked) || errors.Is(err, romm.ErrChanged) {
 		code = 409
 	}
-	if errors.Is(err, romm.ErrUpstream) {
+	if errors.Is(err, romm.ErrUpstream) || errors.Is(err, romm.ErrUnavailable) {
 		code = 502
+	}
+	if errors.Is(err, romm.ErrTimeout) {
+		code = 504
 	}
 	return response(code, map[string]string{"error": err.Error()})
 }
@@ -88,6 +91,11 @@ func (s *Server) Close() {
 	}
 }
 func (s *Server) Handle(ctx context.Context, r *pluginv1.HandleHTTPRequest) (*pluginv1.HandleHTTPResponse, error) {
+	// Leave time to serialize the response before Silo's ten-second route
+	// deadline. This budget covers all upstream calls in a route, including
+	// multi-step sign-in. Large content streams use the separate relay.
+	ctx, cancel := context.WithTimeout(ctx, 8*time.Second)
+	defer cancel()
 	p := r.GetPath()
 	method := r.GetMethod()
 	if method == "" {

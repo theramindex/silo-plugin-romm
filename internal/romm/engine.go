@@ -26,6 +26,15 @@ import (
 var ErrUnlinked = errors.New("Connect this Silo profile to a RomM account first")
 var ErrChanged = errors.New("Account connection changed; reopen the game")
 var ErrUpstream = errors.New("RomM request failed; check the connection and token scopes")
+var ErrTimeout = errors.New("The RomM server timed out. Try again or ask your Silo administrator to check the RomM server connection.")
+var ErrUnavailable = errors.New("Silo could not reach RomM. Try again or ask your Silo administrator to check the RomM server connection.")
+
+func upstreamFailure(ctx context.Context, err error) error {
+	if errors.Is(ctx.Err(), context.DeadlineExceeded) || errors.Is(err, context.DeadlineExceeded) {
+		return ErrTimeout
+	}
+	return ErrUnavailable
+}
 
 type Identity struct {
 	ID       int64  `json:"id"`
@@ -284,7 +293,7 @@ func (e *Engine) request(ctx context.Context, base, token, method, path string, 
 	}
 	response, err := e.client.Do(r)
 	if err != nil {
-		return ErrUpstream
+		return upstreamFailure(ctx, err)
 	}
 	defer response.Body.Close()
 	if response.StatusCode < 200 || response.StatusCode >= 300 {
@@ -292,6 +301,9 @@ func (e *Engine) request(ctx context.Context, base, token, method, path string, 
 	}
 	if out != nil {
 		if err = json.NewDecoder(io.LimitReader(response.Body, 8<<20)).Decode(out); err != nil {
+			if ctx.Err() != nil {
+				return upstreamFailure(ctx, err)
+			}
 			return ErrUpstream
 		}
 	}

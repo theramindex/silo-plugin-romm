@@ -46,11 +46,14 @@ func (e *Engine) devicePost(ctx context.Context, base, path string, in, out any)
 	r.Header.Set("Content-Type", "application/json")
 	response, err := e.client.Do(r)
 	if err != nil {
-		return 0, "", ErrUpstream
+		return 0, "", upstreamFailure(ctx, err)
 	}
 	defer response.Body.Close()
 	data, err := io.ReadAll(io.LimitReader(response.Body, 65537))
 	if err != nil || len(data) > 65536 {
+		if ctx.Err() != nil {
+			return 0, "", upstreamFailure(ctx, err)
+		}
 		return 0, "", ErrUpstream
 	}
 	if response.StatusCode >= 200 && response.StatusCode < 300 {

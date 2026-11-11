@@ -78,6 +78,32 @@ fs.mkdirSync(shots, { recursive: true });
       await page.setViewportSize({ width: 1440, height: 1000 });
     }
     await page.locator(".game-card").waitFor();
+    // Silo/proxies can return plain text or HTML instead of plugin JSON.
+    // Retry must recover without a parser error or a stale error notice.
+    for (const failure of [
+      {
+        status: 502,
+        contentType: "text/plain",
+        body: "plugin route failed\n",
+        message: "Games is temporarily unavailable.",
+      },
+      {
+        status: 504,
+        contentType: "application/json",
+        body: JSON.stringify({ error: "The RomM server timed out. Please try again." }),
+        message: "The RomM server timed out.",
+      },
+    ]) {
+      const { message, ...response } = failure;
+      await page.route("**/api/games?*", (route) => route.fulfill(response));
+      await page.reload();
+      await page.getByRole("button", { name: "Try again", exact: true }).waitFor();
+      assert((await page.locator("#notice").textContent()).includes(message));
+      await page.unroute("**/api/games?*");
+      await page.getByRole("button", { name: "Try again", exact: true }).click();
+      await page.locator(".game-card").waitFor();
+      assert(await page.locator("#notice").isHidden());
+    }
     await page.locator(".game-card").focus();
     await page.evaluate(() => {
       window.testPad = {

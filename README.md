@@ -64,6 +64,12 @@ backed up together. Losing the key requires reconnecting accounts. Tokens stay
 server-side and do not appear in browser responses or error messages. The
 plugin is intended for one Silo server using this data directory.
 
+Library and account requests have an eight-second budget so an unavailable
+RomM returns a JSON error before Silo's route deadline. A timeout keeps the
+saved account connection intact; retry after restoring connectivity. Seeing
+an account under **Account** confirms the saved link, not current server
+reachability. Large game and save downloads use the separate content relay.
+
 ## Development
 
 ```sh

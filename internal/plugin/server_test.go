@@ -10,7 +10,50 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 )
+
+// An unavailable RomM must return a usable JSON error before Silo's ten-second
+// route deadline, without discarding a profile's saved account connection.
+func TestUnavailableLibraryReturnsBeforeHostDeadline(t *testing.T) {
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/users/me" {
+			_, _ = w.Write([]byte(`{"id":91,"username":"Player"}`))
+			return
+		}
+		<-r.Context().Done()
+	}))
+	defer upstream.Close()
+	e, err := romm.New(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = e.Configure(upstream.URL); err != nil {
+		t.Fatal(err)
+	}
+	if _, err = e.Link(context.Background(), `["7","13"]`, "profile-test-token", ""); err != nil {
+		t.Fatal(err)
+	}
+	s := &Server{Engine: e}
+	defer s.Close()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	started := time.Now()
+	out, err := s.Handle(ctx, &pluginv1.HandleHTTPRequest{Path: "/romm/api/platforms", Method: "GET", Headers: map[string]string{"X-Silo-User-Id": "7", "X-Silo-Profile-Id": "13"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var problem map[string]string
+	if out.GetStatusCode() != 504 || json.Unmarshal(out.GetBody(), &problem) != nil || !strings.Contains(problem["error"], "timed out") {
+		t.Fatalf("expected a JSON timeout response, got %d %s", out.GetStatusCode(), out.GetBody())
+	}
+	if elapsed := time.Since(started); elapsed >= 9*time.Second || ctx.Err() != nil {
+		t.Fatalf("host deadline won: %s", elapsed)
+	}
+	if !e.Status(`["7","13"]`).Linked {
+		t.Fatal("outage discarded saved connection")
+	}
+}
 
 func TestHTTPAccountIdentityAndAuthenticatedContent(t *testing.T) {
 	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
