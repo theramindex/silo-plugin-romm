@@ -33,3 +33,10 @@ terser internal/plugin/emulator/data/src/{emulator,nipplejs,shaders,storage,game
 license texts and readable source with redistribution. Before a public release,
 retain or provide corresponding source for the exact pinned emulator/core builds
 under their respective license terms.
+
+Platform SVG illustrations are bundled unmodified from RomM (GPL-3.0), pinned
+at commit `3c5bab7a7fab75d7d755c6e44bc29405907cbf03`:
+https://github.com/rommapp/romm/tree/3c5bab7a7fab75d7d755c6e44bc29405907cbf03/frontend/assets/platforms
+The source reference and upstream attribution text accompany these files in
+`internal/plugin/ui/platforms/`. Platform names and artwork identify the
+user's systems; the Silo client is published by Ramindex.

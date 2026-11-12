@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -16,10 +18,14 @@ import (
 const EmulatorVersion = "emulatorjs-4.2.3"
 
 type Platform struct {
-	ID    int64  `json:"id"`
-	Name  string `json:"name"`
-	Slug  string `json:"slug"`
-	Count int    `json:"rom_count"`
+	ID           int64  `json:"id"`
+	Name         string `json:"name"`
+	Slug         string `json:"slug"`
+	Count        int    `json:"rom_count"`
+	DisplayName  string `json:"display_name,omitempty"`
+	Abbreviation string `json:"abbreviation,omitempty"`
+	Family       string `json:"family_name,omitempty"`
+	Core         string `json:"core,omitempty"`
 }
 type Collection struct {
 	ID    int64  `json:"id"`
@@ -27,19 +33,63 @@ type Collection struct {
 	Count int    `json:"rom_count"`
 }
 type Game struct {
-	ID             int64  `json:"id"`
-	Name           string `json:"name"`
-	Summary        string `json:"summary"`
-	PlatformID     int64  `json:"platform_id"`
-	PlatformSlug   string `json:"platform_slug"`
-	Platform       string `json:"platform_display_name"`
-	Filename       string `json:"fs_name"`
-	LegacyFilename string `json:"file_name,omitempty"`
-	Cover          string `json:"path_cover_small"`
-	LargeCover     string `json:"path_cover_large"`
-	Size           int64  `json:"fs_size_bytes"`
-	Core           string `json:"core"`
+	ID             int64        `json:"id"`
+	Name           string       `json:"name"`
+	Summary        string       `json:"summary"`
+	PlatformID     int64        `json:"platform_id"`
+	PlatformSlug   string       `json:"platform_slug"`
+	Platform       string       `json:"platform_display_name"`
+	Filename       string       `json:"fs_name"`
+	LegacyFilename string       `json:"file_name,omitempty"`
+	Cover          string       `json:"path_cover_small"`
+	LargeCover     string       `json:"path_cover_large"`
+	Size           int64        `json:"fs_size_bytes"`
+	Core           string       `json:"core"`
+	DisplayTitle   string       `json:"display_title"`
+	Metadata       GameMetadata `json:"metadatum"`
 }
+type GameMetadata struct {
+	Genres      []string `json:"genres"`
+	Publishers  []string `json:"publishers"`
+	Developers  []string `json:"developers"`
+	Players     string   `json:"player_count"`
+	ReleaseDate int64    `json:"first_release_date"`
+}
+type BrowseQuery struct {
+	Search, Platform, Collection, Offset, Sort string
+	Playable                                   bool
+}
+
+var fileExtension = regexp.MustCompile(`(?i)\.(zip|rar|7z|nes|sfc|smc|gb|gbc|gba|n64|z64|nds|3ds|iso|bin|cue|chd|cso|pkg|nsp|xci|gcm|md|sms|gg|pce|pbp|wad|wbfs|rvz|wud|wux)$`)
+var releaseID = regexp.MustCompile(`(?i)^\((?:CUSA|PPSA|SLUS|SLES|SCUS|SCES)[0-9-]+\)\s*[-_]?\s*`)
+var packageSuffix = regexp.MustCompile(`(?i)\s+(?:PS[1-5]\s+)?(?:[0-9]+\.[0-9]+\s+)?PKG$`)
+var regionTag = regexp.MustCompile(`(?i)\s*[\(\[](?:USA|Europe|Japan|World|En|En,Fr,De|U|E|J)[\)\]]`)
+var titleSpace = regexp.MustCompile(`\s+`)
+
+func displayTitle(g Game) string {
+	title := g.Name
+	if title == "" {
+		title = g.Filename
+	}
+	if title == "" {
+		return "Untitled game"
+	}
+	if title == g.Filename || fileExtension.MatchString(title) {
+		for fileExtension.MatchString(title) {
+			title = fileExtension.ReplaceAllString(title, "")
+		}
+		title = releaseID.ReplaceAllString(title, "")
+		title = packageSuffix.ReplaceAllString(title, "")
+		title = regionTag.ReplaceAllString(title, "")
+		title = strings.ReplaceAll(title, "_", " ")
+		title = strings.TrimSpace(titleSpace.ReplaceAllString(title, " "))
+	}
+	if title == "" {
+		return g.Name
+	}
+	return title
+}
+
 type Page struct {
 	Items  []Game `json:"items"`
 	Total  int    `json:"total"`
@@ -63,6 +113,13 @@ func Core(slug string) string {
 func (e *Engine) Platforms(ctx context.Context, owner string) ([]Platform, error) {
 	var out []Platform
 	err := e.JSON(ctx, owner, "/api/platforms", &out)
+	for i := range out {
+		if out[i].DisplayName != "" {
+			out[i].Name = out[i].DisplayName
+		}
+		out[i].Core = Core(out[i].Slug)
+	}
+	sort.SliceStable(out, func(i, j int) bool { return strings.ToLower(out[i].Name) < strings.ToLower(out[j].Name) })
 	return out, err
 }
 func (e *Engine) Collections(ctx context.Context, owner string) ([]Collection, error) {
@@ -70,13 +127,24 @@ func (e *Engine) Collections(ctx context.Context, owner string) ([]Collection, e
 	err := e.JSON(ctx, owner, "/api/collections", &out)
 	return out, err
 }
-func (e *Engine) Games(ctx context.Context, owner, search, platform, collection, offset string) (Page, error) {
+func (e *Engine) Games(ctx context.Context, owner string, browse BrowseQuery) (Page, error) {
+	search, platform, collection, offset := browse.Search, browse.Platform, browse.Collection, browse.Offset
 	q := url.Values{"limit": {"48"}, "with_rom_id_index": {"false"}, "with_filter_values": {"false"}}
+	switch browse.Sort {
+	case "", "name":
+		q.Set("order_by", "name")
+		q.Set("order_dir", "asc")
+	case "name-desc":
+		q.Set("order_by", "name")
+		q.Set("order_dir", "desc")
+	case "newest":
+		q.Set("order_by", "created_at")
+		q.Set("order_dir", "desc")
+	default:
+		return Page{}, errors.New("Choose a valid game sort order")
+	}
 	if len(search) > 200 {
 		search = search[:200]
-	}
-	if search != "" {
-		q.Set("search_term", search)
 	}
 	for key, value := range map[string]string{"platform_ids": platform, "collection_id": collection} {
 		if value != "" {
@@ -85,6 +153,28 @@ func (e *Engine) Games(ctx context.Context, owner, search, platform, collection,
 			}
 			q.Set(key, value)
 		}
+	}
+	if browse.Playable {
+		platforms, err := e.Platforms(ctx, owner)
+		if err != nil {
+			return Page{}, err
+		}
+		q.Del("platform_ids")
+		for _, p := range platforms {
+			id := strconv.FormatInt(p.ID, 10)
+			if p.Core != "" && (platform == "" || platform == id) {
+				q.Add("platform_ids", id)
+			}
+		}
+		if len(q["platform_ids"]) == 0 {
+			return Page{Items: []Game{}, Limit: 48}, nil
+		}
+		// Core support is independent of RomM's potentially stale missing-file
+		// scan flag. Check content access when playback starts.
+		q.Set("physical", "false")
+	}
+	if search != "" {
+		q.Set("search_term", search)
 	}
 	n, _ := strconv.Atoi(offset)
 	if n < 0 || n > 100000 {
@@ -95,6 +185,7 @@ func (e *Engine) Games(ctx context.Context, owner, search, platform, collection,
 	err := e.JSON(ctx, owner, "/api/roms?"+q.Encode(), &out)
 	for i := range out.Items {
 		out.Items[i].Core = Core(out.Items[i].PlatformSlug)
+		out.Items[i].DisplayTitle = displayTitle(out.Items[i])
 	}
 	return out, err
 }
@@ -110,6 +201,7 @@ func (e *Engine) Game(ctx context.Context, owner string, id int64) (Game, error)
 	if g.Filename == "" {
 		g.Filename = g.LegacyFilename
 	}
+	g.DisplayTitle = displayTitle(g)
 	g.Core = Core(g.PlatformSlug)
 	return g, nil
 }

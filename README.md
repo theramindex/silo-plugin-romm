@@ -5,6 +5,18 @@ collections and search results, then play NES, SNES, Game Boy, Game Boy Color
 and Game Boy Advance games using bundled EmulatorJS 4.2.3. No iframe, ROMs,
 BIOS files, CDN runtime or remote emulator cores.
 
+The library opens on a platform overview with locally bundled system
+illustrations and searchable navigation. **All games**, **Play in Silo**, and
+personal collections are available in the library rail (the **Menu** drawer
+on phones). Search, alphabetical/recently-added sorting, and the playable
+filter apply before pagination. Cover size is saved per connected profile.
+
+Game cards use RomM artwork when available and a system/title fallback when
+it is missing. File-derived titles are cleaned for display; the original
+filename remains in each game's **File information**. Game details show the
+description and available release, genre, player, developer, and publisher
+metadata. Browser Back restores the gallery's search, filters, and page.
+
 ## Setup
 
 Install a platform-specific `.silo-plugin.zip` on the Ramindex Silo fork and
@@ -86,11 +98,15 @@ a blue screen. It never connects to a real RomM account:
 go run ./cmd/devserver --fixture
 # In another terminal, with Playwright installed:
 PLAYWRIGHT_PATH=/path/to/node_modules/playwright node scripts/browser-smoke.cjs
+PLAYWRIGHT_PATH=/path/to/node_modules/playwright node scripts/library-browser.cjs
 ```
 
 The browser test covers controller-oriented browsing, mobile/light layouts,
 actual WASM startup, save/state upload, resume, and offline retry. Live testing
 against your RomM deployment and physical gamepads remains a deployment check.
+The additional library browser test uses explicitly synthetic data to exercise
+117-platform navigation, sort/playable controls, missing/broken artwork,
+cover density, detail navigation, and dark/light layouts down to 320px.
 
 ## Release
 

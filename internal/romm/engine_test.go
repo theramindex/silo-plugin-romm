@@ -14,6 +14,62 @@ import (
 	"time"
 )
 
+func TestLibraryBrowsingFiltersBeforePagination(t *testing.T) {
+	var calls int
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/api/users/me":
+			fmt.Fprint(w, `{"id":7,"username":"Player"}`)
+		case "/api/platforms":
+			fmt.Fprint(w, `[{"id":1,"slug":"nes"},{"id":2,"slug":"snes"},{"id":3,"slug":"ps4"}]`)
+		case "/api/roms":
+			calls++
+			q := r.URL.Query()
+			if strings.Join(q["platform_ids"], ",") != "1,2" || q.Get("order_by") != "created_at" || q.Get("order_dir") != "desc" || q.Get("offset") != "48" || q.Get("collection_id") != "9" {
+				t.Errorf("incorrect browse query: %v", q)
+			}
+			fmt.Fprint(w, `{"items":[{"id":42,"name":"(CUSA01627) - Test_Game (USA).nes.zip","fs_name":"(CUSA01627) - Test_Game (USA).nes.zip","platform_slug":"nes"}],"total":97}`)
+		default:
+			w.WriteHeader(404)
+		}
+	}))
+	defer upstream.Close()
+	e, err := New(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	e.Configure(upstream.URL)
+	if _, err = e.Link(context.Background(), "owner", "library-test-token", ""); err != nil {
+		t.Fatal(err)
+	}
+	page, err := e.Games(context.Background(), "owner", BrowseQuery{Playable: true, Sort: "newest", Offset: "48", Collection: "9"})
+	if err != nil || page.Total != 97 || len(page.Items) != 1 || page.Items[0].DisplayTitle != "Test Game" {
+		t.Fatalf("browse: %+v %v", page, err)
+	}
+	page, err = e.Games(context.Background(), "owner", BrowseQuery{Playable: true, Platform: "3"})
+	if err != nil || page.Total != 0 || len(page.Items) != 0 || calls != 1 {
+		t.Fatalf("unsupported platform leaked games: %+v %v; calls=%d", page, err, calls)
+	}
+	if _, err = e.Games(context.Background(), "owner", BrowseQuery{Sort: "arbitrary-field"}); err == nil {
+		t.Fatal("invalid sort accepted")
+	}
+}
+
+func TestFileDerivedDisplayTitlesPreserveMetadata(t *testing.T) {
+	for _, tc := range []struct{ name, file, want string }{
+		{"(CUSA01627) - Dead or Alive 5 Last Round PS4 4.05 PKG.rar", "(CUSA01627) - Dead or Alive 5 Last Round PS4 4.05 PKG.rar", "Dead or Alive 5 Last Round"},
+		{"", "Adventure_Game (Europe).gba.zip", "Adventure Game"},
+		{"Pokémon Emerald Version", "Pokemon_Emerald (USA).gba", "Pokémon Emerald Version"},
+		{".hack//G.U. Last Recode", "hack.iso", ".hack//G.U. Last Recode"},
+		{"Game (Rev 2).nes", "Game (Rev 2).nes", "Game (Rev 2)"},
+	} {
+		g := Game{Name: tc.name, Filename: tc.file}
+		if got := displayTitle(g); got != tc.want {
+			t.Errorf("title %q: got %q, want %q", tc.name, got, tc.want)
+		}
+	}
+}
+
 // Contract boundary: a real HTTP upstream and durable link store. Two Silo
 // profiles must never borrow credentials, sessions, or save ownership.
 func TestProfileLinkSaveOwnershipAndRestart(t *testing.T) {

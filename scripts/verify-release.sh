@@ -12,4 +12,6 @@ go vet ./...
 go test -race ./...
 node --check internal/plugin/ui/app.js
 node --check internal/plugin/ui/theme.js
+node --check scripts/library-browser.cjs
+node --check scripts/browser-smoke.cjs
 go run . manifest >/dev/null

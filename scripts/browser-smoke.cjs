@@ -20,7 +20,7 @@ fs.mkdirSync(shots, { recursive: true });
       if (e.message !== "Wake Lock permission request denied")
         errors.push(e.stack || e.message);
     });
-    await page.goto(root + "/romm");
+    await page.goto(root + "/romm#games");
     if (await page.locator("#romm-sign-in").count()) {
       await page.screenshot({
         path: shots + "/connect-desktop.png",
@@ -90,17 +90,23 @@ fs.mkdirSync(shots, { recursive: true });
       {
         status: 504,
         contentType: "application/json",
-        body: JSON.stringify({ error: "The RomM server timed out. Please try again." }),
+        body: JSON.stringify({
+          error: "The RomM server timed out. Please try again.",
+        }),
         message: "The RomM server timed out.",
       },
     ]) {
       const { message, ...response } = failure;
       await page.route("**/api/games?*", (route) => route.fulfill(response));
       await page.reload();
-      await page.getByRole("button", { name: "Try again", exact: true }).waitFor();
+      await page
+        .getByRole("button", { name: "Try again", exact: true })
+        .waitFor();
       assert((await page.locator("#notice").textContent()).includes(message));
       await page.unroute("**/api/games?*");
-      await page.getByRole("button", { name: "Try again", exact: true }).click();
+      await page
+        .getByRole("button", { name: "Try again", exact: true })
+        .click();
       await page.locator(".game-card").waitFor();
       assert(await page.locator("#notice").isHidden());
     }
@@ -118,7 +124,7 @@ fs.mkdirSync(shots, { recursive: true });
       navigator.getGamepads = () => [window.testPad];
       window.testPad.buttons[0].pressed = true;
     });
-    await page.locator("dialog[open]").waitFor();
+    await page.locator("#game-heading").waitFor();
     await page.evaluate(() => {
       window.testPad.buttons[0].pressed = false;
     });
@@ -126,22 +132,22 @@ fs.mkdirSync(shots, { recursive: true });
     await page.evaluate(() => {
       window.testPad.buttons[1].pressed = true;
     });
-    await page.waitForFunction(() => !document.querySelector("dialog[open]"));
+    await page.locator(".game-card").waitFor();
     await page.evaluate(() => {
       window.testPad.buttons[1].pressed = false;
     });
     // A remains an independent edge while a direction is held. Native filters
     // expose a controller-operable choice dialog instead of relying on click().
-    await page.locator("#platform").focus();
+    await page.locator("#sort").focus();
     await page.evaluate(() => {
       window.testPad.buttons[12].pressed = true;
     });
     await page.waitForTimeout(60);
-    await page.locator("#platform").focus();
+    await page.locator("#sort").focus();
     await page.evaluate(() => {
       window.testPad.buttons[0].pressed = true;
     });
-    await page.getByRole("dialog", { name: "Select platform" }).waitFor();
+    await page.getByRole("dialog", { name: "Select sort" }).waitFor();
     await page.evaluate(() => {
       window.testPad.buttons[0].pressed = false;
       window.testPad.buttons[12].pressed = false;
@@ -156,7 +162,7 @@ fs.mkdirSync(shots, { recursive: true });
       window.testPad.buttons[0].pressed = true;
     });
     await page.waitForFunction(() => !document.querySelector("dialog[open]"));
-    assert.equal(await page.locator("#platform").inputValue(), "1");
+    assert.equal(await page.locator("#sort").inputValue(), "name-desc");
     await page.evaluate(() => {
       window.testPad.buttons[0].pressed = false;
     });
@@ -168,7 +174,7 @@ fs.mkdirSync(shots, { recursive: true });
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     );
-    await page.goto(root + "/romm?theme=light");
+    await page.goto(root + "/romm?theme=light#games");
     await page.locator(".game-card").waitFor();
     await page.screenshot({
       path: shots + "/mobile-light.png",

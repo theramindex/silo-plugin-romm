@@ -1,0 +1,4 @@
+Platform SVG artwork from RomM
+https://github.com/rommapp/romm/tree/3c5bab7a7fab75d7d755c6e44bc29405907cbf03/frontend/assets/platforms
+RomM license: GPL-3.0
+Files retained unmodified. See ATTRIBUTIONS.txt for upstream attribution.
