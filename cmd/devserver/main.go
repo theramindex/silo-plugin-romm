@@ -151,9 +151,27 @@ func main() {
 	}
 	server := &plugin.Server{Engine: engine}
 	defer server.Close()
+	manifestBytes, err := os.ReadFile("manifest.json")
+	if err != nil {
+		panic(err)
+	}
+	var manifest struct {
+		Routes []struct{ Method, Path string } `json:"http_routes"`
+	}
+	if err = json.Unmarshal(manifestBytes, &manifest); err != nil {
+		panic(err)
+	}
+	routes := map[string]bool{}
+	for _, route := range manifest.Routes {
+		routes[route.Method+" "+route.Path] = true
+	}
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/" {
 			http.Redirect(w, r, "/romm", 302)
+			return
+		}
+		if !routes[r.Method+" "+r.URL.Path] {
+			http.NotFound(w, r)
 			return
 		}
 		query := map[string]any{}

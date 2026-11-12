@@ -622,6 +622,741 @@
       "method": "POST",
       "access": "authenticated",
       "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-0",
+      "method": "GET",
+      "path": "/romm/assets/platforms/1292-advanced-programmable-video-system.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-1",
+      "method": "GET",
+      "path": "/romm/assets/platforms/32x.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-2",
+      "method": "GET",
+      "path": "/romm/assets/platforms/3do.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-3",
+      "method": "GET",
+      "path": "/romm/assets/platforms/3ds.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-4",
+      "method": "GET",
+      "path": "/romm/assets/platforms/ATTRIBUTIONS.txt",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-5",
+      "method": "GET",
+      "path": "/romm/assets/platforms/SOURCE.txt",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-6",
+      "method": "GET",
+      "path": "/romm/assets/platforms/abc-80.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-7",
+      "method": "GET",
+      "path": "/romm/assets/platforms/acorn-archimedes.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-8",
+      "method": "GET",
+      "path": "/romm/assets/platforms/acorn-electron.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-9",
+      "method": "GET",
+      "path": "/romm/assets/platforms/acpc.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-10",
+      "method": "GET",
+      "path": "/romm/assets/platforms/adventure-vision.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-11",
+      "method": "GET",
+      "path": "/romm/assets/platforms/airconsole.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-12",
+      "method": "GET",
+      "path": "/romm/assets/platforms/alice-3290.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-13",
+      "method": "GET",
+      "path": "/romm/assets/platforms/altair-680.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-14",
+      "method": "GET",
+      "path": "/romm/assets/platforms/altair-8800.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-15",
+      "method": "GET",
+      "path": "/romm/assets/platforms/amazon-alexa.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-16",
+      "method": "GET",
+      "path": "/romm/assets/platforms/amazon-fire-tv.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-17",
+      "method": "GET",
+      "path": "/romm/assets/platforms/amiga-cd32.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-18",
+      "method": "GET",
+      "path": "/romm/assets/platforms/amiga.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-19",
+      "method": "GET",
+      "path": "/romm/assets/platforms/amiga1200.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-20",
+      "method": "GET",
+      "path": "/romm/assets/platforms/android.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-21",
+      "method": "GET",
+      "path": "/romm/assets/platforms/apf.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-22",
+      "method": "GET",
+      "path": "/romm/assets/platforms/apple-iigs.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-23",
+      "method": "GET",
+      "path": "/romm/assets/platforms/apple.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-24",
+      "method": "GET",
+      "path": "/romm/assets/platforms/appleii.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-25",
+      "method": "GET",
+      "path": "/romm/assets/platforms/arcade.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-26",
+      "method": "GET",
+      "path": "/romm/assets/platforms/arcadia-2001.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-27",
+      "method": "GET",
+      "path": "/romm/assets/platforms/arduboy.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-28",
+      "method": "GET",
+      "path": "/romm/assets/platforms/atari-jaguar-cd.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-29",
+      "method": "GET",
+      "path": "/romm/assets/platforms/atari-st.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-30",
+      "method": "GET",
+      "path": "/romm/assets/platforms/atari2600.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-31",
+      "method": "GET",
+      "path": "/romm/assets/platforms/atari7800.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-32",
+      "method": "GET",
+      "path": "/romm/assets/platforms/atari800.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-33",
+      "method": "GET",
+      "path": "/romm/assets/platforms/colecovision.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-34",
+      "method": "GET",
+      "path": "/romm/assets/platforms/commodore-cdtv.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-35",
+      "method": "GET",
+      "path": "/romm/assets/platforms/dc.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-36",
+      "method": "GET",
+      "path": "/romm/assets/platforms/dice.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-37",
+      "method": "GET",
+      "path": "/romm/assets/platforms/gaelco.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-38",
+      "method": "GET",
+      "path": "/romm/assets/platforms/gamegear.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-39",
+      "method": "GET",
+      "path": "/romm/assets/platforms/gb.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-40",
+      "method": "GET",
+      "path": "/romm/assets/platforms/gba.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-41",
+      "method": "GET",
+      "path": "/romm/assets/platforms/gbc.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-42",
+      "method": "GET",
+      "path": "/romm/assets/platforms/genesis.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-43",
+      "method": "GET",
+      "path": "/romm/assets/platforms/hikaru.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-44",
+      "method": "GET",
+      "path": "/romm/assets/platforms/index.json",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-45",
+      "method": "GET",
+      "path": "/romm/assets/platforms/intellivision.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-46",
+      "method": "GET",
+      "path": "/romm/assets/platforms/jaguar.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-47",
+      "method": "GET",
+      "path": "/romm/assets/platforms/lindbergh.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-48",
+      "method": "GET",
+      "path": "/romm/assets/platforms/linux.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-49",
+      "method": "GET",
+      "path": "/romm/assets/platforms/lynx.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-50",
+      "method": "GET",
+      "path": "/romm/assets/platforms/mame-advmame.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-51",
+      "method": "GET",
+      "path": "/romm/assets/platforms/mame.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-52",
+      "method": "GET",
+      "path": "/romm/assets/platforms/mega-duck-slash-cougar-boy.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-53",
+      "method": "GET",
+      "path": "/romm/assets/platforms/megaduck.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-54",
+      "method": "GET",
+      "path": "/romm/assets/platforms/model2.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-55",
+      "method": "GET",
+      "path": "/romm/assets/platforms/model3.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-56",
+      "method": "GET",
+      "path": "/romm/assets/platforms/n64.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-57",
+      "method": "GET",
+      "path": "/romm/assets/platforms/namco2x6.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-58",
+      "method": "GET",
+      "path": "/romm/assets/platforms/namco3xx.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-59",
+      "method": "GET",
+      "path": "/romm/assets/platforms/naomi.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-60",
+      "method": "GET",
+      "path": "/romm/assets/platforms/naomi2.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-61",
+      "method": "GET",
+      "path": "/romm/assets/platforms/naomigd.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-62",
+      "method": "GET",
+      "path": "/romm/assets/platforms/nds-original.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-63",
+      "method": "GET",
+      "path": "/romm/assets/platforms/nds.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-64",
+      "method": "GET",
+      "path": "/romm/assets/platforms/neo-geo-pocket-color.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-65",
+      "method": "GET",
+      "path": "/romm/assets/platforms/neo-geo-pocket.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-66",
+      "method": "GET",
+      "path": "/romm/assets/platforms/neo-geo-x.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-67",
+      "method": "GET",
+      "path": "/romm/assets/platforms/neogeoaes.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-68",
+      "method": "GET",
+      "path": "/romm/assets/platforms/nes.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-69",
+      "method": "GET",
+      "path": "/romm/assets/platforms/new-nintendo-3ds.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-70",
+      "method": "GET",
+      "path": "/romm/assets/platforms/ngc.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-71",
+      "method": "GET",
+      "path": "/romm/assets/platforms/odyssey-2-slash-videopac-g7000.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-72",
+      "method": "GET",
+      "path": "/romm/assets/platforms/odyssey-2.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-73",
+      "method": "GET",
+      "path": "/romm/assets/platforms/ps2.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-74",
+      "method": "GET",
+      "path": "/romm/assets/platforms/ps3.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-75",
+      "method": "GET",
+      "path": "/romm/assets/platforms/ps4.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-76",
+      "method": "GET",
+      "path": "/romm/assets/platforms/ps5.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-77",
+      "method": "GET",
+      "path": "/romm/assets/platforms/psp.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-78",
+      "method": "GET",
+      "path": "/romm/assets/platforms/psx.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-79",
+      "method": "GET",
+      "path": "/romm/assets/platforms/sega32.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-80",
+      "method": "GET",
+      "path": "/romm/assets/platforms/segacd32.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-81",
+      "method": "GET",
+      "path": "/romm/assets/platforms/series-x-s.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-82",
+      "method": "GET",
+      "path": "/romm/assets/platforms/series-x.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-83",
+      "method": "GET",
+      "path": "/romm/assets/platforms/sfam.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-84",
+      "method": "GET",
+      "path": "/romm/assets/platforms/singe.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-85",
+      "method": "GET",
+      "path": "/romm/assets/platforms/snes-msu1.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-86",
+      "method": "GET",
+      "path": "/romm/assets/platforms/snes.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-87",
+      "method": "GET",
+      "path": "/romm/assets/platforms/stv.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-88",
+      "method": "GET",
+      "path": "/romm/assets/platforms/switch-2-console.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-89",
+      "method": "GET",
+      "path": "/romm/assets/platforms/switch-2.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-90",
+      "method": "GET",
+      "path": "/romm/assets/platforms/switch-console.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-91",
+      "method": "GET",
+      "path": "/romm/assets/platforms/switch.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-92",
+      "method": "GET",
+      "path": "/romm/assets/platforms/teknoparrot.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-93",
+      "method": "GET",
+      "path": "/romm/assets/platforms/tg16.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-94",
+      "method": "GET",
+      "path": "/romm/assets/platforms/triforce.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-95",
+      "method": "GET",
+      "path": "/romm/assets/platforms/turbografx-cd.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-96",
+      "method": "GET",
+      "path": "/romm/assets/platforms/type-x.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-97",
+      "method": "GET",
+      "path": "/romm/assets/platforms/vsmile.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-98",
+      "method": "GET",
+      "path": "/romm/assets/platforms/wii.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-99",
+      "method": "GET",
+      "path": "/romm/assets/platforms/wiiu.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-100",
+      "method": "GET",
+      "path": "/romm/assets/platforms/wonderswan-color.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-101",
+      "method": "GET",
+      "path": "/romm/assets/platforms/wonderswan.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-102",
+      "method": "GET",
+      "path": "/romm/assets/platforms/xbox.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-103",
+      "method": "GET",
+      "path": "/romm/assets/platforms/xbox360.svg",
+      "access": "authenticated",
+      "navigable": false
+    },
+    {
+      "id": "romm-platform-asset-104",
+      "method": "GET",
+      "path": "/romm/assets/platforms/xboxone.svg",
+      "access": "authenticated",
+      "navigable": false
     }
   ],
   "global_config_schema": [

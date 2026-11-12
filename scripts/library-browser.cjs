@@ -84,6 +84,11 @@ fs.mkdirSync(shots, { recursive: true });
     assert.equal(linked.status(), 200);
     await page.goto(root + "/romm");
     await page.locator(".platform-tile").first().waitFor();
+    await page.waitForFunction(
+      () =>
+        document.querySelector(".platform-tile img.platform-icon")
+          ?.naturalWidth > 0,
+    );
     assert.equal(await page.locator(".platform-tile").count(), 117);
     await page.screenshot({ path: shots + "/platforms-desktop.png" });
     await page
