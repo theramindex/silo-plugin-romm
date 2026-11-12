@@ -968,7 +968,9 @@ async function renderGameDetail(id, from) {
           e.target.value +
           "&from=" +
           encodeURIComponent(from || "games");
-        history.replaceState(null, "", "#" + route);
+        const url = new URL(location.href);
+        url.hash = route;
+        history.replaceState(null, "", url.href);
         renderLibraryRoute();
       };
     if ($("launch"))

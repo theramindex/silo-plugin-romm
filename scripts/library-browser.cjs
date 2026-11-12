@@ -84,7 +84,7 @@ fs.mkdirSync(shots, { recursive: true });
       data: { token: "rmm_development-fixture-token" },
     });
     assert.equal(linked.status(), 200);
-    await page.goto(root + "/romm");
+    await page.goto(root + "/romm?theme=midnight-cinema");
     await page.locator(".platform-tile").first().waitFor();
     await page.waitForFunction(
       () =>
@@ -187,6 +187,7 @@ fs.mkdirSync(shots, { recursive: true });
       await page.locator("#rom-version option:checked").textContent(),
       /Europe.*Preferred in RomM/,
     );
+    assert.equal(new URL(page.url()).search, "?theme=midnight-cinema");
     let launchID;
     await page.route(/\/api\/play(?:\?|$)/, (route) => {
       launchID = route.request().postDataJSON().id;
