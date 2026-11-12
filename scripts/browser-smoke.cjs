@@ -78,6 +78,10 @@ fs.mkdirSync(shots, { recursive: true });
       await page.setViewportSize({ width: 1440, height: 1000 });
     }
     await page.locator(".game-card").waitFor();
+    await page.waitForFunction(
+      () =>
+        document.querySelector(".game-card img[data-art]")?.naturalWidth > 0,
+    );
     // Silo/proxies can return plain text or HTML instead of plugin JSON.
     // Retry must recover without a parser error or a stale error notice.
     for (const failure of [

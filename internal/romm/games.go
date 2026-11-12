@@ -387,8 +387,19 @@ func (e *Engine) Artwork(ctx context.Context, owner string, id int64) (*http.Res
 	}
 	p = "/" + strings.TrimLeft(p, "/")
 	u, err := url.Parse(p)
-	if err != nil || u.RawQuery != "" || u.Fragment != "" || strings.Contains(p, "%") || strings.Contains(p, "..") || !strings.HasPrefix(path.Clean(p), "/assets/romm/") {
+	if err != nil || u.Fragment != "" || u.RawPath != "" || strings.Contains(u.Path, "%") || strings.Contains(u.Path, "..") || !strings.HasPrefix(path.Clean(u.Path), "/assets/romm/") {
 		return nil, ErrUpstream
+	}
+	// RomM appends a cache-busting timestamp, sometimes containing literal
+	// spaces. Preserve that value in encoded form without opening other query
+	// parameters or relaxing the same-server asset-path boundary.
+	q, err := url.ParseQuery(u.RawQuery)
+	if err != nil || (len(q) != 0 && (len(q) != 1 || len(q["ts"]) != 1)) {
+		return nil, ErrUpstream
+	}
+	p = u.Path
+	if len(q) != 0 {
+		p += "?" + q.Encode()
 	}
 	return e.stream(ctx, owner, p)
 }

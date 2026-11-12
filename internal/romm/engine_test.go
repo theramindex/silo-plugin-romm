@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -13,6 +14,72 @@ import (
 	"testing"
 	"time"
 )
+
+func TestArtworkCacheTimestampsAndPathBoundary(t *testing.T) {
+	const cover = "/assets/romm/resources/roms/117/57967/cover/big.png"
+	for _, tc := range []struct {
+		name, path string
+		allowed    bool
+	}{
+		{"plain", cover, true},
+		{"RomM timestamp", cover + "?ts=2026-11-12 03:00:22", true},
+		{"encoded timestamp", cover + "?ts=2026-11-12%2003%3A00%3A22", true},
+		{"other query", cover + "?redirect=https://other.invalid", false},
+		{"extra query", cover + "?ts=1&redirect=elsewhere", false},
+		{"traversal", "/assets/romm/%2e%2e/private.png?ts=1", false},
+		{"external", "https://other.invalid/assets/romm/cover.png?ts=1", false},
+		{"fragment", cover + "?ts=1#fragment", false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			coverCalls := 0
+			up := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch r.URL.Path {
+				case "/api/users/me":
+					fmt.Fprint(w, `{"id":7,"username":"Player"}`)
+				case "/api/roms/57967":
+					json.NewEncoder(w).Encode(map[string]any{"id": 57967, "name": "Dr. Mario", "path_cover_large": tc.path})
+				case cover:
+					coverCalls++
+					wantTS := ""
+					if tc.name != "plain" {
+						wantTS = "2026-11-12 03:00:22"
+					}
+					if r.URL.Query().Get("ts") != wantTS || len(r.URL.Query()) > 1 || r.Header.Get("Authorization") != "Bearer artwork-test-token" {
+						t.Errorf("cover request changed boundary: query=%q", r.URL.RawQuery)
+					}
+					w.Header().Set("Content-Type", "image/png")
+					fmt.Fprint(w, "cover bytes")
+				default:
+					w.WriteHeader(404)
+				}
+			}))
+			defer up.Close()
+			e, err := New(t.TempDir())
+			if err != nil {
+				t.Fatal(err)
+			}
+			e.Configure(up.URL)
+			if _, err = e.Link(context.Background(), "owner", "artwork-test-token", ""); err != nil {
+				t.Fatal(err)
+			}
+			res, err := e.Artwork(context.Background(), "owner", 57967)
+			if !tc.allowed {
+				if err == nil || coverCalls != 0 {
+					t.Fatalf("unsafe artwork accepted: err=%v calls=%d", err, coverCalls)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("valid RomM cover rejected: %v", err)
+			}
+			defer res.Body.Close()
+			body, err := io.ReadAll(res.Body)
+			if err != nil || string(body) != "cover bytes" || coverCalls != 1 {
+				t.Fatalf("cover delivery failed: %q %v calls=%d", body, err, coverCalls)
+			}
+		})
+	}
+}
 
 func TestLibraryBrowsingFiltersBeforePagination(t *testing.T) {
 	var calls int

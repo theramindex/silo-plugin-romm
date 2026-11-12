@@ -91,9 +91,9 @@ func main() {
 		case r.URL.Path == "/api/collections":
 			fmt.Fprint(w, `[{"id":1,"name":"Homebrew","rom_count":1}]`)
 		case r.URL.Path == "/api/roms":
-			fmt.Fprint(w, `{"items":[{"id":42,"name":"Silo Controller Test","platform_id":1,"platform_slug":"nes","platform_display_name":"NES","core":"fceumm","path_cover_small":"/assets/romm/test.png"}],"total":1}`)
+			fmt.Fprint(w, `{"items":[{"id":42,"name":"Silo Controller Test","platform_id":1,"platform_slug":"nes","platform_display_name":"NES","core":"fceumm","path_cover_small":"/assets/romm/test.png?ts=2026-11-12 03:00:22"}],"total":1}`)
 		case r.URL.Path == "/api/roms/42":
-			fmt.Fprint(w, `{"id":42,"name":"Silo Controller Test","summary":"An original NES diagnostic cartridge. A blue screen confirms the bundled core booted successfully. Used only by the local development harness.","platform_id":1,"platform_slug":"nes","platform_display_name":"NES","fs_name":"silo-test.nes","path_cover_small":"/assets/romm/test.png"}`)
+			fmt.Fprint(w, `{"id":42,"name":"Silo Controller Test","summary":"An original NES diagnostic cartridge. A blue screen confirms the bundled core booted successfully. Used only by the local development harness.","platform_id":1,"platform_slug":"nes","platform_display_name":"NES","fs_name":"silo-test.nes","path_cover_small":"/assets/romm/test.png?ts=2026-11-12 03:00:22"}`)
 		case strings.HasPrefix(r.URL.Path, "/api/roms/42/content/"):
 			w.Header().Set("Content-Type", "application/octet-stream")
 			_, _ = w.Write(testROM())
