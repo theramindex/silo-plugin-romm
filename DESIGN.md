@@ -163,11 +163,11 @@ The root size follows Silo readability preferences: default (16px), large (18px)
 
 The library is a full-width rail-and-content composition, not the older centered form-and-grid layout. A sticky, independently scrollable rail occupies (238px), narrowing to (210px) at the intermediate breakpoint (1000px). The content column can shrink without overflow, is capped at (1800px), and uses responsive horizontal gutters between (20px) and (48px). The initial viewport combines the searchable rail with a searchable platform overview.
 
-Platform tiles use an auto-filling grid with a minimum column width (155px) and landscape artwork (4:3). Supported and other platforms form separate groups. Each tile places its name and game count below its illustration. The gallery changes the main region to search, sort and optional collection controls, followed by a playable filter, cover-size control, results status, cover grid and pagination.
+Platform tiles use an auto-filling grid with a minimum column width (155px) and landscape artwork (4:3). Supported and other platforms form separate groups. Each tile places its name and raw ROM count below its illustration. Empty platforms are hidden by default, with a profile-scoped Show empty platforms preference that also governs navigation. The gallery changes the main region to search, sort and optional collection controls, followed by a playable filter, cover-size control, results status, cover grid and pagination.
 
-Large covers use minimum columns (175px) and gaps (28px by 20px). Small covers use minimum columns (125px) and gaps (25px by 16px). Both preserve portrait artwork (3:4) and put title and platform metadata outside the image. Gallery route state restores through browser navigation; density is a separate presentation preference.
+Large covers use minimum columns (175px) and gaps (28px by 20px). Small covers use minimum columns (125px) and gaps (25px by 16px). Both use portrait frames (3:4), contain the full artwork without cropping, and put title, platform metadata and an available-version count outside the image. Gallery route state restores through browser navigation; density is a separate presentation preference.
 
-The full detail page uses an artwork column between (180px) and (300px), with a flexible reading column. Artwork stays sticky on desktop. A back action precedes the page; title, platform, genres when available, play state, description, available facts and a file-information disclosure follow in reading order.
+The full detail page uses an artwork column between (180px) and (300px), with a flexible reading column. Artwork stays sticky on desktop. A back action precedes the page; title, platform, genres when available, ROM version picker when needed, play state, description, available facts and a file-information disclosure follow in reading order.
 
 At (1000px), gallery search takes a full row and the detail artwork narrows. At (720px), the rail becomes a fixed navigation drawer opened from the header. It keeps the same platform search and library destinations, closes after choosing a destination, and exposes its expanded state. Content gutters tighten to (18px). Platform tiles and large covers use two columns; small covers use three. A mobile platform select supplements the drawer. Detail artwork centers above the reading column, with static positioning and a maximum width (230px).
 
@@ -175,7 +175,7 @@ The dedicated player uses a viewport-height flex column. Its control header wrap
 
 ## Elevation & Depth
 
-Tonal separation and thin boundaries provide most depth. Platform and game cards have no padded outer shell or resting shadow. Platform artwork has a subtle mixed neutral ground; game artwork fills its clipped cover. Account, controller-choice and pause dialogs use a dark translucent backdrop. Transient notices carry the floating shadow (see the sidecar).
+Tonal separation and thin boundaries provide most depth. Platform and game cards have no padded outer shell or resting shadow. Platform artwork has a subtle mixed neutral ground; game artwork fits inside its clipped cover while preserving the full image. Account, controller-choice and pause dialogs use a dark translucent backdrop. Transient notices carry the floating shadow (see the sidecar).
 
 Hover lifts platform artwork and game covers slightly (3px), only without a reduced-motion preference. The current stylesheet uses a spring-shaped easing over (180ms) for platform artwork and a later cover override of (140ms ease) for game covers. These motions indicate an interactive target without moving its text.
 
@@ -189,7 +189,7 @@ Controls use compact rounded corners; rail items are slightly tighter. Covers, p
 
 ### Buttons
 
-Direct, text-led actions use the shared control shape. Secondary buttons use the surface and border pair, with a raised-surface hover. Primary buttons use the inverse pair and stronger weight (650). The detail play action adds a minimum height (46px); browser sign-in spans its form and uses a minimum height (48px). Back and breadcrumb actions combine a small inline SVG with a quiet text button.
+Direct, text-led actions use the shared control shape. Secondary buttons use the surface and border pair, with a raised-surface hover. Primary buttons use the inverse pair and stronger weight (650). The detail play action adds a minimum height (46px); browser sign-in spans its form and uses a minimum height (48px). Back and breadcrumb actions combine a small inline SVG with a quiet text button. Header, navigation and filter controls keep a minimum target height (44px), including mobile Menu and Account actions.
 
 Disabled controls reduce opacity (0.55) and show a waiting cursor. Keyboard focus uses an outline (3px) with offset (4px); gallery card focus increases the offset to (5px).
 
@@ -207,13 +207,13 @@ Bundled RomM SVG platform illustrations sit contained inside landscape artwork a
 
 ### Game Cards / Artwork Fallbacks
 
-A game card combines a portrait cover, a two-line title and a muted platform line into one target. Supported games show a small positive play SVG with an accessible label. Other cards omit that indicator; they do not accumulate negative badges.
+A game card combines a portrait cover, a two-line title, a muted platform line and an available-version count into one target. RomM metadata grouping defines the card identity; matching display titles alone do not combine games. Supported games show a small positive play SVG with an accessible label. Other cards omit that indicator; they do not accumulate negative badges.
 
 The fallback is already behind the cover image, so missing or failed artwork reveals a deliberate platform illustration and cleaned game title. Large desktop fallbacks also include platform text; mobile large fallbacks omit that redundant platform line. Small-cover density shows only the platform illustration inside the artwork, preserving the title and platform below it. Title clamping preserves whole lines. The detail page uses the same fallback at a larger size. Original file information remains available in the detail disclosure.
 
 ### Full Game Detail
 
-Details occupy the main content area and retain library navigation. The title comes before platform metadata. Available genres, release year, player count, developer and publisher use restrained text or label/value pairs. The description remains readable without an internal scroll box. The primary action is Play / Resume when supported; otherwise an explanatory browse-only state names the supported systems. Launch progress remains next to the action.
+Details occupy the main content area and retain library navigation. The title comes before platform metadata. Available genres, release year, player count, developer and publisher use restrained text or label/value pairs. The description remains readable without an internal scroll box. The primary action is Play / Resume when supported; otherwise an explanatory browse-only state names the supported systems. A labeled ROM version select appears for metadata-linked siblings, identifies the preferred version saved in RomM and loads the selected ROM before launch. Switching versions preserves the gallery return state without changing the RomM preference. Launch progress remains next to the action.
 
 ### Dialogs / Connection
 

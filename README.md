@@ -9,13 +9,23 @@ The library opens on a platform overview with locally bundled system
 illustrations and searchable navigation. **All games**, **Play in Silo**, and
 personal collections are available in the library rail (the **Menu** drawer
 on phones). Search, alphabetical/recently-added sorting, and the playable
-filter apply before pagination. Cover size is saved per connected profile.
+filter apply before pagination. Empty platforms are hidden by default; **Show
+empty platforms** restores them. Cover size and platform visibility are saved
+per connected profile.
 
 Game cards use RomM artwork when available and a system/title fallback when
 it is missing. File-derived titles are cleaned for display; the original
 filename remains in each game's **File information**. Game details show the
 description and available release, genre, player, developer, and publisher
-metadata. Browser Back restores the gallery's search, filters, and page.
+metadata. Covers keep their original proportions without cropping. Browser
+Back restores the gallery's search, filters, and page.
+
+Games sharing a RomM metadata identity appear as one card with a version count.
+Open the game and use **ROM version** to choose the region, revision, or file
+before playing. The picker identifies your preferred version from RomM and
+launches the selected ROM with its own compatible progress. Choosing a version
+here does not change your saved preference in RomM. Unmatched games remain
+separate; titles alone are never used to merge ROMs.
 
 ## Setup
 
@@ -105,8 +115,9 @@ The browser test covers controller-oriented browsing, mobile/light layouts,
 actual WASM startup, save/state upload, resume, and offline retry. Live testing
 against your RomM deployment and physical gamepads remains a deployment check.
 The additional library browser test uses explicitly synthetic data to exercise
-117-platform navigation, sort/playable controls, missing/broken artwork,
-cover density, detail navigation, and dark/light layouts down to 320px.
+117-platform navigation, empty-platform preferences, sort/playable controls,
+missing/broken artwork, cover density, release dates, ROM version selection and
+launch identity, detail navigation, and dark/light layouts down to 320px.
 
 ## Release
 

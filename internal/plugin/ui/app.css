@@ -633,7 +633,7 @@ button.primary {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   z-index: 1;
 }
 .cover-fallback {
@@ -1291,4 +1291,79 @@ dialog::backdrop {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* Browsing refinements: keep source covers intact and ROM choices explicit. */
+.overview-controls {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 38px;
+}
+.overview-controls .overview-search {
+  flex: 1;
+  margin-bottom: 0;
+  min-width: min(100%, 260px);
+}
+.empty-platforms-toggle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.8125rem;
+  min-height: 44px;
+  cursor: pointer;
+}
+.empty-platforms-toggle input {
+  accent-color: var(--accent);
+  margin: 0;
+  width: 16px;
+  height: 16px;
+}
+.game-card-meta > span:first-child {
+  flex: 1;
+}
+.version-count {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.rom-version {
+  display: block;
+  margin-top: 28px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.rom-version > span {
+  font-weight: 400;
+  color: var(--muted);
+  margin-left: 8px;
+}
+.rom-version select {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  font-size: 0.8125rem;
+}
+.app-header button,
+.library-rail button,
+.gallery-toolbar input,
+.gallery-toolbar select,
+.density-control select,
+.rom-version select {
+  min-height: 44px;
+}
+@media (max-width: 720px) {
+  .overview-controls {
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .overview-controls .overview-search {
+    flex-basis: 100%;
+  }
+  .back-library,
+  .breadcrumb,
+  .section-heading .text-button {
+    min-height: 44px;
+  }
 }

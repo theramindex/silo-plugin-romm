@@ -213,7 +213,7 @@
       "name": "Primary button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The principal sign-in or play action, using Silo’s inverse pair.",
+      "description": "The principal sign-in or play action, using Silo\u2019s inverse pair.",
       "html": "<button class=\"ds-primary\">Play / Resume</button>",
       "css": ".ds-primary{font-family:var(--font-body, \"Plus Jakarta Sans\", ui-sans-serif, system-ui, sans-serif);font-size:16px;font-weight:650;padding:10px 15px;border:1px solid var(--border,#28282e);border-radius:8px;background:var(--accent,#e8e8ec);color:var(--on-accent,#141417);cursor:pointer}.ds-primary:hover{background:var(--accent,#e8e8ec)}.ds-primary:focus-visible{outline:3px solid var(--accent,#e8e8ec);outline-offset:4px}.ds-primary:disabled{opacity:.55;cursor:wait}"
     },
@@ -281,7 +281,7 @@
   ],
   "narrative": {
     "northStar": "The Silo Library",
-    "overview": "RomM presents a platform-first personal games library within Silo's existing visual language. A searchable navigation rail and illustrated platform overview help you choose a system or Play in Silo before browsing covers, opening a full detail page, and playing or resuming a game. Genuine game artwork and bundled RomM platform illustrations supply the character; the surrounding interface stays calm, familiar and content-led.\n\nDark and light themes share the same geometry and bundled typography. Compact controls, explicit state text and visible focus support keyboard, touch and controller access. The player keeps this control language while giving the game the remaining viewport.",
+    "overview": "RomM presents a platform-first personal games library within Silo's existing visual language. A searchable navigation rail and illustrated platform overview help you choose a system or Play in Silo before browsing covers, opening a full detail page, choosing a ROM version when available, and playing or resuming a game. Empty platforms are hidden by default with an explicit visibility preference. Genuine game artwork and bundled RomM platform illustrations supply the character; the surrounding interface stays calm, familiar and content-led.\n\nDark and light themes share the same geometry and bundled typography. Compact controls, explicit state text and visible focus support keyboard, touch and controller access. The player keeps this control language while giving the game the remaining viewport.",
     "keyCharacteristics": [
       "Semantic Silo colors with coherent dark and light fallbacks.",
       "One bundled type family for headings, content and controls.",
@@ -311,7 +311,8 @@
       "Do keep platform tiles landscape and game covers portrait, with readable titles below the artwork.",
       "Do keep the game title before platform metadata on the detail page.",
       "Do preserve explicit labels, semantic selected states and visible keyboard focus.",
-      "Do keep the game stage dominant and progress text visible."
+      "Do keep the game stage dominant and progress text visible.",
+      "Do contain complete cover artwork and group versions by RomM metadata identity, with an explicit ROM picker before launch."
     ],
     "donts": [
       "Don't introduce a competing decorative palette or display face.",

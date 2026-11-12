@@ -47,6 +47,7 @@ const platforms = [
     slug: "fixture-" + i,
     rom_count: 40 + i,
   })),
+  { id: 999, name: "Empty archive", slug: "fixture-empty", rom_count: 0 },
 ].sort((a, b) => a.name.localeCompare(b.name));
 const games = Array.from({ length: 48 }, (_, i) => ({
   id: 42 + i,
@@ -60,6 +61,7 @@ const games = Array.from({ length: 48 }, (_, i) => ({
 }));
 games[0].name = games[0].display_title =
   "An exceptionally long synthetic adventure title for a narrow cover";
+games[0].version_count = 2;
 fs.mkdirSync(shots, { recursive: true });
 (async () => {
   const browser = await chromium.launch({ headless: true });
@@ -90,6 +92,20 @@ fs.mkdirSync(shots, { recursive: true });
           ?.naturalWidth > 0,
     );
     assert.equal(await page.locator(".platform-tile").count(), 117);
+    await page.getByRole("checkbox", { name: "Show empty platforms" }).check();
+    assert.equal(await page.locator(".platform-tile").count(), 118);
+    await page.reload();
+    await page.locator(".platform-tile").first().waitFor();
+    assert(
+      await page
+        .getByRole("checkbox", { name: "Show empty platforms" })
+        .isChecked(),
+    );
+    assert.equal(await page.locator(".platform-tile").count(), 118);
+    await page
+      .getByRole("checkbox", { name: "Show empty platforms" })
+      .uncheck();
+    assert.equal(await page.locator(".platform-tile").count(), 117);
     await page.screenshot({ path: shots + "/platforms-desktop.png" });
     await page
       .getByRole("searchbox", { name: "Find a platform", exact: true })
@@ -98,6 +114,14 @@ fs.mkdirSync(shots, { recursive: true });
     await page.locator('#platform-links [data-platform="1"]').click();
     await page.locator(".game-card").first().waitFor();
     assert.equal(await page.locator(".game-card").count(), 48);
+    assert.equal(
+      await page
+        .locator(".game-card")
+        .first()
+        .locator(".version-count")
+        .textContent(),
+      "2 versions",
+    );
     assert.equal(
       await page.getByText("Browse only", { exact: true }).count(),
       0,
@@ -142,7 +166,48 @@ fs.mkdirSync(shots, { recursive: true });
     assert.equal(await page.locator("dialog[open]").count(), 0);
     await page.getByText("File information", { exact: true }).click();
     await page.getByText("silo-test.nes", { exact: true }).waitFor();
+    await page.getByText("1990", { exact: true }).waitFor();
+    assert.equal(await page.locator("#rom-version option").count(), 2);
+    assert.equal(
+      await page
+        .locator(".detail-artwork img[data-art]")
+        .evaluate((el) => getComputedStyle(el).objectFit),
+      "contain",
+    );
     await page.screenshot({ path: shots + "/detail-desktop.png" });
+    await page.locator("#rom-version").selectOption("43");
+    await page.waitForFunction(
+      () => document.querySelector("#rom-version")?.value === "43",
+    );
+    assert.equal(
+      await page.evaluate(() => document.activeElement?.id),
+      "rom-version",
+    );
+    assert.match(
+      await page.locator("#rom-version option:checked").textContent(),
+      /Europe.*Preferred in RomM/,
+    );
+    let launchID;
+    await page.route(/\/api\/play(?:\?|$)/, (route) => {
+      launchID = route.request().postDataJSON().id;
+      return route.fulfill({
+        status: 400,
+        json: { error: "Launch selection verified" },
+      });
+    });
+    await page.getByRole("button", { name: "Play / Resume" }).click();
+    await page
+      .getByText("Launch selection verified", { exact: true })
+      .waitFor();
+    assert.equal(
+      launchID,
+      43,
+      "launch used the original ROM instead of the chosen version",
+    );
+    await page.unroute(/\/api\/play(?:\?|$)/);
+    await page.getByText("File information", { exact: true }).click();
+    await page.getByText("silo-test (Europe).nes", { exact: true }).waitFor();
+    await page.screenshot({ path: shots + "/version-selected.png" });
     await page.goBack();
     await page.locator(".game-card").first().waitFor();
     assert.equal(await page.locator("#sort").inputValue(), "newest");
@@ -154,6 +219,16 @@ fs.mkdirSync(shots, { recursive: true });
     const galleryURL = page.url();
     for (const width of [390, 320]) {
       await page.setViewportSize({ width, height: 844 });
+      assert(
+        await page
+          .locator(".app-header button")
+          .evaluateAll((els) =>
+            els
+              .filter((el) => el.getClientRects().length)
+              .every((el) => el.getBoundingClientRect().height >= 44),
+          ),
+        "small phone header targets",
+      );
       assert(
         await page.evaluate(
           () => document.documentElement.scrollWidth <= innerWidth,
@@ -218,7 +293,7 @@ fs.mkdirSync(shots, { recursive: true });
     await page.screenshot({ path: shots + "/detail-mobile.png" });
     assert.deepEqual(errors, []);
     console.log(
-      "PASS: 117-platform navigation, gallery sort/play filters, artwork fallback, density, detail/back state, mobile drawer, dark/light and 320px overflow",
+      "PASS: platform visibility, grouped ROM versions and selected launch, release dates, artwork, gallery filters, detail/back state, touch targets, dark/light and 320px overflow",
     );
   } finally {
     await browser.close();

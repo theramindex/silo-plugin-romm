@@ -40,6 +40,7 @@ type Game struct {
 	PlatformSlug   string       `json:"platform_slug"`
 	Platform       string       `json:"platform_display_name"`
 	Filename       string       `json:"fs_name"`
+	FilenameNoExt  string       `json:"fs_name_no_ext"`
 	LegacyFilename string       `json:"file_name,omitempty"`
 	Cover          string       `json:"path_cover_small"`
 	LargeCover     string       `json:"path_cover_large"`
@@ -47,6 +48,18 @@ type Game struct {
 	Core           string       `json:"core"`
 	DisplayTitle   string       `json:"display_title"`
 	Metadata       GameMetadata `json:"metadatum"`
+	Siblings       []SiblingROM `json:"sibling_roms"`
+	VersionCount   int          `json:"version_count"`
+	User           GameUser     `json:"rom_user"`
+}
+type SiblingROM struct {
+	ID        int64  `json:"id"`
+	Name      string `json:"name"`
+	Filename  string `json:"fs_name_no_ext"`
+	Preferred bool   `json:"is_main_sibling"`
+}
+type GameUser struct {
+	Preferred bool `json:"is_main_sibling"`
 }
 type GameMetadata struct {
 	Genres      []string `json:"genres"`
@@ -54,7 +67,43 @@ type GameMetadata struct {
 	Developers  []string `json:"developers"`
 	Players     string   `json:"player_count"`
 	ReleaseDate int64    `json:"first_release_date"`
+	ReleaseYear int      `json:"release_year"`
 }
+
+func normalizeGame(g *Game) {
+	g.Core = Core(g.PlatformSlug)
+	if g.Filename == "" {
+		g.Filename = g.LegacyFilename
+	}
+	if g.FilenameNoExt == "" {
+		g.FilenameNoExt = strings.TrimSuffix(g.Filename, path.Ext(g.Filename))
+	}
+	g.DisplayTitle = displayTitle(*g)
+	// RomM metadata providers have returned both Unix seconds and milliseconds.
+	// Prefer seconds when plausible, then milliseconds; omit invalid dates.
+	g.Metadata.ReleaseYear = 0
+	stamp := g.Metadata.ReleaseDate
+	if stamp != 0 {
+		for _, date := range []time.Time{time.Unix(stamp, 0), time.UnixMilli(stamp)} {
+			year := date.UTC().Year()
+			if year >= 1850 && year <= 2100 {
+				g.Metadata.ReleaseYear = year
+				break
+			}
+		}
+	}
+	seen := map[int64]bool{g.ID: true}
+	siblings := make([]SiblingROM, 0, len(g.Siblings))
+	for _, s := range g.Siblings {
+		if s.ID > 0 && !seen[s.ID] {
+			seen[s.ID] = true
+			siblings = append(siblings, s)
+		}
+	}
+	g.Siblings = siblings
+	g.VersionCount = len(siblings) + 1
+}
+
 type BrowseQuery struct {
 	Search, Platform, Collection, Offset, Sort string
 	Playable                                   bool
@@ -129,7 +178,7 @@ func (e *Engine) Collections(ctx context.Context, owner string) ([]Collection, e
 }
 func (e *Engine) Games(ctx context.Context, owner string, browse BrowseQuery) (Page, error) {
 	search, platform, collection, offset := browse.Search, browse.Platform, browse.Collection, browse.Offset
-	q := url.Values{"limit": {"48"}, "with_rom_id_index": {"false"}, "with_filter_values": {"false"}}
+	q := url.Values{"limit": {"48"}, "with_rom_id_index": {"false"}, "with_filter_values": {"false"}, "group_by_meta_id": {"true"}}
 	switch browse.Sort {
 	case "", "name":
 		q.Set("order_by", "name")
@@ -184,8 +233,7 @@ func (e *Engine) Games(ctx context.Context, owner string, browse BrowseQuery) (P
 	var out Page
 	err := e.JSON(ctx, owner, "/api/roms?"+q.Encode(), &out)
 	for i := range out.Items {
-		out.Items[i].Core = Core(out.Items[i].PlatformSlug)
-		out.Items[i].DisplayTitle = displayTitle(out.Items[i])
+		normalizeGame(&out.Items[i])
 	}
 	return out, err
 }
@@ -198,11 +246,7 @@ func (e *Engine) Game(ctx context.Context, owner string, id int64) (Game, error)
 	if g.ID != id {
 		return Game{}, ErrUpstream
 	}
-	if g.Filename == "" {
-		g.Filename = g.LegacyFilename
-	}
-	g.DisplayTitle = displayTitle(g)
-	g.Core = Core(g.PlatformSlug)
+	normalizeGame(&g)
 	return g, nil
 }
 
