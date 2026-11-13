@@ -301,6 +301,29 @@ fs.mkdirSync(shots, { recursive: true });
     await page.unroute("**/api/content?*");
     await back.click();
     await page.getByRole("button", { name: "Resume", exact: true }).waitFor();
+    await page.goto(root + "/romm?theme=light#platforms");
+    await page.locator('.activity-grid [data-game="42"]').waitFor();
+    await page.locator("#view-recent").click();
+    await page
+      .getByRole("heading", {
+        name: "Played in Silo on this device",
+        exact: true,
+      })
+      .waitFor();
+    await page.locator('.activity-grid [data-game="42"]').click();
+    await page.getByRole("button", { name: "Resume", exact: true }).waitFor();
+    await page.request.post(root + "/romm/api/link", {
+      data: { token: "rmm_development-fixture-token" },
+    });
+    await page.goto(root + "/romm?theme=light#platforms");
+    await page.reload();
+    await page.locator(".platform-tile").first().waitFor();
+    await page.locator("#continue-games .activity-empty").waitFor();
+    assert.equal(
+      await page.locator('.activity-grid [data-game="42"]').count(),
+      0,
+      "device play history must not cross linked connections",
+    );
     assert.deepEqual(errors, []);
     console.log(
       "PASS: browser sign-in approval/cancel/decline, browse, mobile/light layout, emulator boot, isolated storage, save, resume, failed-sync outbox and retry",

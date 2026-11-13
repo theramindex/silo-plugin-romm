@@ -17,6 +17,7 @@ name-based user matching, shared admin credentials or browser token exposure.
 
 The Games header and navigation stay visible while browsing. Scoped search and a
 compact toolbar prioritize covers; mobile secondary filters expand on demand.
-Pinned/recent platforms are local connection preferences. Continue playing uses
-RomM’s own per-user history and opens the exact played ROM. Resume appears only
+Pinned/recent platforms are local connection preferences. Continue playing merges
+RomM’s per-user history with successful Silo starts saved locally for the linked
+connection and opens the exact played ROM. Resume appears only
 when compatible progress is known; checking details never reserves a game session.

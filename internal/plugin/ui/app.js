@@ -115,6 +115,72 @@ function rememberPlatform(id, namespace = library.connection?.namespace) {
   if (namespace === library.connection?.namespace)
     library.recentPlatforms = recent;
 }
+// RomM's player-download audit does not update its last-played property. Keep
+// successful Silo starts locally rather than asking for ROM metadata write scope.
+function recentDeviceGames(namespace = library.connection?.namespace) {
+  let records;
+  try {
+    records = JSON.parse(
+      localStorage.getItem(prefKey("recent-games", namespace)) || "[]",
+    );
+  } catch {
+    return [];
+  }
+  if (!Array.isArray(records)) return [];
+  return records
+    .filter(
+      (g) =>
+        Number.isSafeInteger(g?.id) &&
+        g.id > 0 &&
+        typeof g.name === "string" &&
+        typeof g.platform_slug === "string" &&
+        /^[a-z0-9_-]{1,64}$/.test(g.platform_slug) &&
+        ["fceumm", "snes9x", "gambatte", "mgba"].includes(g.core) &&
+        Number.isFinite(Date.parse(g.rom_user?.last_played)),
+    )
+    .slice(0, 12);
+}
+function rememberGame(game, namespace) {
+  if (!namespace) return;
+  const record = {
+    id: game.id,
+    name: titleOf(game),
+    display_title: titleOf(game),
+    platform_id: game.platform_id,
+    platform_slug: game.platform_slug,
+    platform_display_name: game.platform_display_name,
+    core: game.core,
+    path_cover_small: game.path_cover_small,
+    path_cover_large: game.path_cover_large,
+    version_count: game.version_count,
+    rom_user: { last_played: new Date().toISOString() },
+  };
+  savePreference(
+    "recent-games",
+    [
+      record,
+      ...recentDeviceGames(namespace).filter((g) => g.id !== game.id),
+    ].slice(0, 12),
+    namespace,
+  );
+}
+function mergeRecentGames(games) {
+  const byID = new Map();
+  for (const g of [...recentDeviceGames(), ...games]) {
+    if (!g.core || !g.rom_user?.last_played) continue;
+    const previous = byID.get(g.id);
+    if (
+      !previous ||
+      Date.parse(g.rom_user.last_played) >
+        Date.parse(previous.rom_user.last_played)
+    )
+      byID.set(g.id, g);
+  }
+  return [...byID.values()].sort(
+    (a, b) =>
+      Date.parse(b.rom_user.last_played) - Date.parse(a.rom_user.last_played),
+  );
+}
 function headerBrowseState() {
   let route = location.hash.slice(1);
   if (route.startsWith("game?"))
@@ -869,21 +935,36 @@ async function loadContinuePlaying() {
       ).items ||
       [];
     if (gen !== library.generation || !target.isConnected) return;
-    library.activity = games.filter((g) => g.rom_user?.last_played && g.core);
+    library.activity = mergeRecentGames(games);
     target.innerHTML = library.activity.length
       ? '<div class="activity-grid">' +
         library.activity.slice(0, 6).map(gameCardMarkup).join("") +
         "</div>"
-      : '<p class="activity-empty">Your recently played games on supported systems will appear here.</p>';
+      : '<p class="activity-empty">Play a supported game here or in RomM to find it here next time. Games started in Silo are remembered on this device for your linked account.</p>';
     hydrateArtwork(target);
     bindGameCards(target);
+    if (library.restoreActivity && library.restoreGame) {
+      target
+        .querySelector('[data-game="' + library.restoreGame + '"]')
+        ?.focus({ preventScroll: true });
+      window.scrollTo({ top: library.galleryScroll || 0 });
+      library.restoreGame = null;
+    }
   } catch (error) {
     if (gen !== library.generation || !target.isConnected) return;
+    const local = needsSiloLaunch(error) ? [] : recentDeviceGames();
     target.innerHTML =
+      (local.length
+        ? '<div class="activity-grid">' +
+          local.slice(0, 6).map(gameCardMarkup).join("") +
+          "</div>"
+        : "") +
       '<p class="activity-empty">' +
       esc(error.message) +
       "</p>" +
       recoveryActions(error, "retry-activity");
+    hydrateArtwork(target);
+    bindGameCards(target);
     if ($("retry-activity")) $("retry-activity").onclick = loadContinuePlaying;
   }
 }
@@ -979,6 +1060,32 @@ function renderPlatformGroups(search) {
     .querySelectorAll("[data-route]")
     .forEach((b) => (b.onclick = () => navigateLibrary(b.dataset.route)));
 }
+function deviceHistoryMarkup() {
+  if (
+    !library.recent ||
+    library.offset ||
+    library.collection ||
+    library.sort === "newest"
+  )
+    return "";
+  const games = recentDeviceGames().filter(
+    (g) =>
+      (!library.platform || String(g.platform_id) === library.platform) &&
+      (!library.search ||
+        titleOf(g).toLowerCase().includes(library.search.toLowerCase())),
+  );
+  if (library.sort === "name" || library.sort === "name-desc")
+    games.sort(
+      (a, b) =>
+        titleOf(a).localeCompare(titleOf(b)) *
+        (library.sort === "name-desc" ? -1 : 1),
+    );
+  return games.length
+    ? '<section class="continue-section" aria-labelledby="device-history-heading"><div class="section-heading"><h2 id="device-history-heading">Played in Silo on this device</h2></div><div class="activity-grid">' +
+        games.map(gameCardMarkup).join("") +
+        '</div></section><div class="section-heading"><h2>RomM history</h2></div>'
+    : "";
+}
 function renderGallery() {
   const platform = library.platforms.find(
     (p) => String(p.id) === library.platform,
@@ -1057,12 +1164,15 @@ function renderGallery() {
       )
       .join("") +
     "</div>" +
+    deviceHistoryMarkup() +
     '<div id="grid" class="game-grid" data-density="' +
     library.density +
     '" aria-label="Games"></div><nav id="pagination" aria-label="Game pages"></nav>';
   $("library-content").querySelector("[data-home]").onclick = () =>
     navigateLibrary("platforms");
   bindPinButtons($("library-content"));
+  bindGameCards($("library-content"));
+  hydrateArtwork($("library-content"));
   $("platform").value = library.platform;
   $("sort").value = library.sort;
   if ($("collection")) $("collection").value = library.collection;
@@ -1147,15 +1257,22 @@ async function loadGames() {
     const games = page.items || [];
     $("result-count").textContent =
       countText(page.total ?? games.length) +
-      ((page.total ?? games.length) === 1 ? " game" : " games");
+      ((page.total ?? games.length) === 1 ? " game" : " games") +
+      (library.recent ? " in RomM history" : "");
     grid.innerHTML = games.length
       ? games.map(gameCardMarkup).join("")
       : '<div class="empty"><h2>' +
-        (library.playable ? "No playable games here" : "No games found") +
+        (library.recent
+          ? "No games in RomM history"
+          : library.playable
+            ? "No playable games here"
+            : "No games found") +
         "</h2><p>" +
-        (library.playable
-          ? "Silo supports NES, SNES, Game Boy, Game Boy Color, and Game Boy Advance. Try another platform or turn off the playable filter."
-          : "Try another search, platform, or collection.") +
+        (library.recent
+          ? "Games played in RomM appear here. Games started in Silo are kept in this device’s history above."
+          : library.playable
+            ? "Silo supports NES, SNES, Game Boy, Game Boy Color, and Game Boy Advance. Try another platform or turn off the playable filter."
+            : "Try another search, platform, or collection.") +
         '</p><button id="clear-filters">Clear filters</button></div>';
     hydrateArtwork(grid);
     bindGameCards(grid);
@@ -1193,7 +1310,10 @@ async function loadGames() {
           }),
       );
     if (library.restoreGame) {
-      grid
+      (library.restoreActivity
+        ? $("library-content").querySelector(".activity-grid") || grid
+        : grid
+      )
         .querySelector('[data-game="' + library.restoreGame + '"]')
         ?.focus({ preventScroll: true });
       window.scrollTo({ top: library.galleryScroll || 0 });
@@ -1224,6 +1344,7 @@ async function openGame(id, button) {
   library.lastFocus = button;
   library.galleryScroll = window.scrollY;
   library.restoreGame = id;
+  library.restoreActivity = !!button.closest(".activity-grid");
   navigateLibrary(
     "game?id=" +
       id +
@@ -1804,6 +1925,7 @@ async function startPlayer() {
   window.EJS_onGameStart = () => {
     player.started = true;
     rememberPlatform(s.game.platform_id, s.generation);
+    rememberGame(s.game, s.generation);
     $("player-loading").hidden = true;
     if (saveData && !window.EJS_loadStateURL) {
       const manager = window.EJS_emulator.gameManager;
