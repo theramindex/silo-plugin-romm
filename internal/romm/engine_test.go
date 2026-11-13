@@ -155,6 +155,52 @@ func TestReleaseDatesInSecondsAndMilliseconds(t *testing.T) {
 	}
 }
 
+func TestPlayChecksCurrentFileAvailability(t *testing.T) {
+	for _, tc := range []struct {
+		name    string
+		onDisk  any
+		blocked bool
+	}{
+		{"missing file", false, true},
+		{"present file despite stale scan flag", true, false},
+		{"older server without disk check", nil, false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			up := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch r.URL.Path {
+				case "/api/users/me":
+					fmt.Fprint(w, `{"id":7,"username":"Player"}`)
+				case "/api/roms/42":
+					json.NewEncoder(w).Encode(map[string]any{"id": 42, "name": "Diagnostic ROM", "platform_slug": "nes", "fs_name": "test.nes", "missing_from_fs": true, "has_file_on_disk": tc.onDisk})
+				case "/api/saves", "/api/states", "/api/firmware":
+					fmt.Fprint(w, `[]`)
+				default:
+					w.WriteHeader(404)
+				}
+			}))
+			defer up.Close()
+			e, err := New(t.TempDir())
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err = e.Configure(up.URL); err != nil {
+				t.Fatal(err)
+			}
+			if _, err = e.Link(context.Background(), "owner", "availability-test-token", ""); err != nil {
+				t.Fatal(err)
+			}
+			s, err := e.Play(context.Background(), "owner", 42)
+			if tc.blocked {
+				if err == nil || !strings.Contains(err.Error(), "cannot find this ROM file") || s.ID != "" {
+					t.Fatalf("missing file was offered for play: session=%t err=%v", s.ID != "", err)
+				}
+			} else if err != nil || s.ID == "" {
+				t.Fatalf("file availability rejected a usable or unknown ROM: %v", err)
+			}
+		})
+	}
+}
+
 // Contract boundary: a real HTTP upstream and durable link store. Two Silo
 // profiles must never borrow credentials, sessions, or save ownership.
 func TestProfileLinkSaveOwnershipAndRestart(t *testing.T) {

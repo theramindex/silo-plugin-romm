@@ -45,6 +45,7 @@ type Game struct {
 	Cover          string       `json:"path_cover_small"`
 	LargeCover     string       `json:"path_cover_large"`
 	Size           int64        `json:"fs_size_bytes"`
+	OnDisk         *bool        `json:"has_file_on_disk,omitempty"`
 	Core           string       `json:"core"`
 	DisplayTitle   string       `json:"display_title"`
 	Metadata       GameMetadata `json:"metadatum"`
@@ -287,6 +288,9 @@ func (e *Engine) Play(ctx context.Context, owner string, id int64) (Session, err
 	g, err := e.Game(ctx, owner, id)
 	if err != nil {
 		return Session{}, err
+	}
+	if g.OnDisk != nil && !*g.OnDisk {
+		return Session{}, errors.New("RomM cannot find this ROM file. Check its library storage or choose another version.")
 	}
 	if g.Core == "" {
 		return Session{}, errors.New("Browser play currently supports NES, SNES, Game Boy, Game Boy Color and Game Boy Advance")

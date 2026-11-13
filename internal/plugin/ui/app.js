@@ -771,7 +771,7 @@ async function loadGames() {
                   g.version_count +
                   " versions</span>"
                 : "") +
-              (g.core
+              (g.core && g.has_file_on_disk !== false
                 ? '<span class="play-indicator" title="Playable in Silo">' +
                   icon("play") +
                   '<span class="sr-only">Playable in Silo</span></span>'
@@ -925,7 +925,11 @@ async function renderGameDetail(id, from) {
         : "") +
       versionPicker +
       '<div class="detail-actions">' +
-      (g.core
+      (g.has_file_on_disk === false
+        ? '<p class="unsupported-message"><strong>ROM file unavailable</strong><br>This ROM file is missing from RomM’s storage. Check that its library is mounted, then check again.' +
+          (versions.length > 1 ? " You can also try another ROM version." : "") +
+          '</p><button id="retry-game">Check again</button>'
+        : g.core
         ? '<button id="launch" class="primary">' +
           icon("play") +
           "Play / Resume</button><p>Play here with your connected RomM account. Your compatible saved progress resumes automatically.</p>"
@@ -950,6 +954,7 @@ async function renderGameDetail(id, from) {
         : "") +
       "</dl></details></div></article>";
     $("back-library").onclick = () => backToLibrary(from);
+    if ($("retry-game")) $("retry-game").onclick = renderLibraryRoute;
     hydrateArtwork(content);
     if (library.focusVersion && $("rom-version")) {
       $("rom-version").focus({ preventScroll: true });

@@ -209,6 +209,24 @@ fs.mkdirSync(shots, { recursive: true });
     await page.getByText("File information", { exact: true }).click();
     await page.getByText("silo-test (Europe).nes", { exact: true }).waitFor();
     await page.screenshot({ path: shots + "/version-selected.png" });
+    let missing = true;
+    await page.route(/\/api\/game(?:\?|$)/, async (route) => {
+      const response = await route.fetch();
+      const game = await response.json();
+      await route.fulfill({
+        response,
+        json: { ...game, has_file_on_disk: !missing },
+      });
+    });
+    await page.locator("#rom-version").selectOption("42");
+    await page.getByText("ROM file unavailable", { exact: true }).waitFor();
+    assert.equal(await page.locator("#launch").count(), 0);
+    await page.screenshot({ path: shots + "/missing-rom.png" });
+    missing = false;
+    await page.getByRole("button", { name: "Check again", exact: true }).click();
+    await page.getByRole("button", { name: "Play / Resume" }).waitFor();
+    assert.equal(await page.getByText("ROM file unavailable", { exact: true }).count(), 0);
+    await page.unroute(/\/api\/game(?:\?|$)/);
     await page.goBack();
     await page.locator(".game-card").first().waitFor();
     assert.equal(await page.locator("#sort").inputValue(), "newest");

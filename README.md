@@ -27,6 +27,11 @@ launches the selected ROM with its own compatible progress. Choosing a version
 here does not change your saved preference in RomM. Unmatched games remain
 separate; titles alone are never used to merge ROMs.
 
+When RomM reports that a ROM file is absent from its current storage, Games
+keeps its artwork and metadata available but replaces Play with **ROM file
+unavailable** and **Check again**. Restore the RomM library mount or select an
+available version, then check again. Stale scan flags alone do not block play.
+
 ## Setup
 
 Install a platform-specific `.silo-plugin.zip` on the Ramindex Silo fork and
