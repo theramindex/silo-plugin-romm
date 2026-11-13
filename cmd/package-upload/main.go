@@ -10,10 +10,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 
-	pluginv1 "github.com/Silo-Server/silo-plugin-sdk/pkg/pluginproto/silo/plugin/v1"
 	publicmanifest "github.com/Silo-Server/silo-plugin-sdk/pkg/pluginsdk/manifest"
 	"google.golang.org/protobuf/encoding/protojson"
 )
@@ -60,7 +58,17 @@ func main() {
 	manifest.PluginId = *pluginID
 	manifest.Version = *version
 	manifest.Checksum = checksum
-	manifest.SupportedPlatforms = []*pluginv1.SupportedPlatform{{Os: firstNonEmpty(*goos, runtime.GOOS), Arch: firstNonEmpty(*goarch, runtime.GOARCH)}}
+	// The host requires equality with the running binary's manifest. The build
+	// target selects an artifact; it does not narrow the manifest declarations.
+	declared := false
+	for _, target := range manifest.SupportedPlatforms {
+		if target.Os == *goos && target.Arch == *goarch {
+			declared = true
+		}
+	}
+	if !declared {
+		fail("build target is not declared by the runtime manifest")
+	}
 
 	baseName := filepath.Base(*binaryPath)
 	outManifestPath := filepath.Join(filepath.Dir(*binaryPath), baseName+".manifest.json")
@@ -125,14 +133,4 @@ func fail(message string) {
 
 func failf(format string, args ...any) {
 	fail(fmt.Sprintf(format, args...))
-}
-
-func firstNonEmpty(values ...string) string {
-	for _, value := range values {
-		value = strings.TrimSpace(value)
-		if value != "" {
-			return value
-		}
-	}
-	return ""
 }
