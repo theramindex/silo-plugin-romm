@@ -27,10 +27,12 @@ launches the selected ROM with its own compatible progress. Choosing a version
 here does not change your saved preference in RomM. Unmatched games remain
 separate; titles alone are never used to merge ROMs.
 
-When RomM reports that a ROM file is absent from its current storage, Games
+When RomM reports that a ROM file is unavailable, Games
 keeps its artwork and metadata available but replaces Play with **ROM file
 unavailable** and **Check again**. Restore the RomM library mount or select an
-available version, then check again. Stale scan flags alone do not block play.
+available version, then check again. RomM derives availability from its scan
+status: after restoring storage, run a quick scan of the affected games in
+RomM before choosing **Check again**. The plugin does not scan library storage.
 
 ## Setup
 

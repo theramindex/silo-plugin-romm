@@ -155,14 +155,14 @@ func TestReleaseDatesInSecondsAndMilliseconds(t *testing.T) {
 	}
 }
 
-func TestPlayChecksCurrentFileAvailability(t *testing.T) {
+func TestPlayUsesRomMFileAvailability(t *testing.T) {
 	for _, tc := range []struct {
 		name    string
 		onDisk  any
 		blocked bool
 	}{
 		{"missing file", false, true},
-		{"present file despite stale scan flag", true, false},
+		{"RomM reports file present", true, false},
 		{"older server without disk check", nil, false},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -171,7 +171,8 @@ func TestPlayChecksCurrentFileAvailability(t *testing.T) {
 				case "/api/users/me":
 					fmt.Fprint(w, `{"id":7,"username":"Player"}`)
 				case "/api/roms/42":
-					json.NewEncoder(w).Encode(map[string]any{"id": 42, "name": "Diagnostic ROM", "platform_slug": "nes", "fs_name": "test.nes", "missing_from_fs": true, "has_file_on_disk": tc.onDisk})
+					// RomM derives has_file_on_disk from its stored missing flag.
+					json.NewEncoder(w).Encode(map[string]any{"id": 42, "name": "Diagnostic ROM", "platform_slug": "nes", "fs_name": "test.nes", "missing_from_fs": tc.onDisk != true, "has_file_on_disk": tc.onDisk})
 				case "/api/saves", "/api/states", "/api/firmware":
 					fmt.Fprint(w, `[]`)
 				default:
