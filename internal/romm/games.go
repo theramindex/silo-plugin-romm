@@ -60,7 +60,8 @@ type SiblingROM struct {
 	Preferred bool   `json:"is_main_sibling"`
 }
 type GameUser struct {
-	Preferred bool `json:"is_main_sibling"`
+	Preferred  bool   `json:"is_main_sibling"`
+	LastPlayed string `json:"last_played,omitempty"`
 }
 type GameMetadata struct {
 	Genres      []string `json:"genres"`
@@ -108,6 +109,7 @@ func normalizeGame(g *Game) {
 type BrowseQuery struct {
 	Search, Platform, Collection, Offset, Sort string
 	Playable                                   bool
+	Recent                                     bool
 }
 
 var fileExtension = regexp.MustCompile(`(?i)\.(zip|rar|7z|nes|sfc|smc|gb|gbc|gba|n64|z64|nds|3ds|iso|bin|cue|chd|cso|pkg|nsp|xci|gcm|md|sms|gg|pce|pbp|wad|wbfs|rvz|wud|wux)$`)
@@ -180,6 +182,13 @@ func (e *Engine) Collections(ctx context.Context, owner string) ([]Collection, e
 func (e *Engine) Games(ctx context.Context, owner string, browse BrowseQuery) (Page, error) {
 	search, platform, collection, offset := browse.Search, browse.Platform, browse.Collection, browse.Offset
 	q := url.Values{"limit": {"48"}, "with_rom_id_index": {"false"}, "with_filter_values": {"false"}, "group_by_meta_id": {"true"}}
+	if browse.Recent {
+		q.Set("last_played", "true")
+		q.Set("group_by_meta_id", "false") // History must retain the actual played ROM version.
+		if browse.Sort == "" {
+			browse.Sort = "last-played"
+		}
+	}
 	switch browse.Sort {
 	case "", "name":
 		q.Set("order_by", "name")
@@ -189,6 +198,12 @@ func (e *Engine) Games(ctx context.Context, owner string, browse BrowseQuery) (P
 		q.Set("order_dir", "desc")
 	case "newest":
 		q.Set("order_by", "created_at")
+		q.Set("order_dir", "desc")
+	case "last-played":
+		if !browse.Recent {
+			return Page{}, errors.New("Choose Continue playing to browse recent games")
+		}
+		q.Set("order_by", "last_played")
 		q.Set("order_dir", "desc")
 	default:
 		return Page{}, errors.New("Choose a valid game sort order")
@@ -304,23 +319,11 @@ func (e *Engine) Play(ctx context.Context, owner string, id int64) (Session, err
 	s := Session{ID: randomID(), Owner: owner, Generation: link.Generation, Server: link.Server, Game: g, Emulator: g.Core + "-" + EmulatorVersion, Namespace: link.Generation + "-" + strconv.FormatInt(id, 10), Expires: time.Now().Add(6 * time.Hour)}
 	// A failed save lookup must stop launch: starting a fresh game could overwrite
 	// a remote save during a temporary outage or with a read-only token.
-	for _, kind := range []string{"saves", "states"} {
-		assets, err := e.assets(ctx, owner, kind, id)
-		if err != nil {
-			return Session{}, err
-		}
-		var newest Asset
-		for _, a := range assets {
-			if a.ROM == id && a.User == link.Identity.ID && a.Emulator == s.Emulator && a.Updated >= newest.Updated {
-				newest = a
-			}
-		}
-		if kind == "saves" {
-			s.SaveID = newest.ID
-		} else {
-			s.StateID = newest.ID
-		}
+	progress, err := e.compatibleProgress(ctx, owner, g, link.Identity.ID)
+	if err != nil {
+		return Session{}, err
 	}
+	s.SaveID, s.StateID = progress.saveID, progress.stateID
 	// These initial cores work without BIOS, but use a matching installed firmware
 	// when RomM has one. No BIOS or ROM data is bundled with the plugin.
 	var firmware []struct {

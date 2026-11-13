@@ -165,12 +165,12 @@ func (s *Server) Handle(ctx context.Context, r *pluginv1.HandleHTTPRequest) (*pl
 	case p == "/romm/api/collections" && method == "GET":
 		out, err = s.Engine.Collections(ctx, own)
 	case p == "/romm/api/games" && method == "GET":
-		out, err = s.Engine.Games(ctx, own, romm.BrowseQuery{Search: query(r, "search"), Platform: query(r, "platform"), Collection: query(r, "collection"), Offset: query(r, "offset"), Sort: query(r, "sort"), Playable: query(r, "playable") == "true"})
+		out, err = s.Engine.Games(ctx, own, romm.BrowseQuery{Search: query(r, "search"), Platform: query(r, "platform"), Collection: query(r, "collection"), Offset: query(r, "offset"), Sort: query(r, "sort"), Playable: query(r, "playable") == "true", Recent: query(r, "recent") == "true"})
 	case p == "/romm/api/game" && method == "GET":
 		var id int64
 		id, err = romm.ID(query(r, "id"))
 		if err == nil {
-			out, err = s.Engine.Game(ctx, own, id)
+			out, err = s.Engine.Detail(ctx, own, id)
 		}
 	case p == "/romm/api/play" && method == "POST":
 		var in struct {

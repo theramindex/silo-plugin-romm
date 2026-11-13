@@ -75,7 +75,20 @@ fs.mkdirSync(shots, { recursive: true });
       route.fulfill({ json: platforms }),
     );
     await page.route(/\/api\/games(?:\?|$)/, (route) =>
-      route.fulfill({ json: { items: games, total: 97 } }),
+      route.fulfill({
+        json:
+          new URL(route.request().url()).searchParams.get("recent") === "true"
+            ? {
+                items: [
+                  {
+                    ...games[1],
+                    rom_user: { last_played: "2026-11-12T12:00:00Z" },
+                  },
+                ],
+                total: 1,
+              }
+            : { items: games, total: 97 },
+      }),
     );
     await page.route(/\/api\/art\?/, (route) =>
       route.fulfill({ status: 503, body: "Artwork unavailable" }),
@@ -106,6 +119,18 @@ fs.mkdirSync(shots, { recursive: true });
       .getByRole("checkbox", { name: "Show empty platforms" })
       .uncheck();
     assert.equal(await page.locator(".platform-tile").count(), 117);
+    await page.locator('.activity-grid [data-game="43"]').waitFor();
+    await page.locator('.activity-grid [data-game="43"]').click();
+    await page.waitForFunction(
+      () => document.querySelector("#rom-version")?.value === "43",
+    );
+    assert.equal(
+      new URLSearchParams(page.url().split("#game?")[1]).get("id"),
+      "43",
+      "history must open the actual played ROM version",
+    );
+    await page.locator("#back-library").click();
+    await page.locator(".platform-tile").first().waitFor();
     await page.screenshot({ path: shots + "/platforms-desktop.png" });
     await page
       .getByRole("searchbox", { name: "Find a platform", exact: true })
@@ -134,6 +159,53 @@ fs.mkdirSync(shots, { recursive: true });
         .locator(".cover-fallback")
         .isVisible(),
     );
+    await page.locator("#pin-platform").click();
+    await page.locator("#unpin-1").waitFor();
+    await page.reload();
+    await page.locator("#unpin-1").waitFor();
+    assert.equal(
+      await page.locator("#pin-platform").getAttribute("aria-pressed"),
+      "true",
+    );
+    assert.match(
+      await page.locator("#search").getAttribute("aria-label"),
+      /Nintendo Entertainment/,
+    );
+    await page.locator("#search").fill("synthetic");
+    await page.waitForFunction(() =>
+      location.hash.includes("search=synthetic"),
+    );
+    assert.equal(
+      await page.evaluate(() => document.activeElement.id),
+      "search",
+    );
+    await page
+      .getByRole("button", { name: "Remove Search: synthetic", exact: true })
+      .click();
+    await page.waitForFunction(() => !location.hash.includes("search="));
+    await page.evaluate(() => scrollTo(0, 700));
+    await page.waitForTimeout(40);
+    assert(
+      await page.evaluate(
+        () =>
+          Math.abs(
+            document.querySelector(".library-header").getBoundingClientRect()
+              .top,
+          ) < 1,
+      ),
+    );
+    assert(
+      await page.evaluate(
+        () =>
+          Math.abs(
+            document.querySelector(".library-rail").getBoundingClientRect()
+              .top -
+              document.querySelector(".library-header").getBoundingClientRect()
+                .bottom,
+          ) < 2,
+      ),
+    );
+    await page.evaluate(() => scrollTo(0, 0));
     let query = page.waitForRequest(
       (r) =>
         r.url().includes("/api/games?") &&
@@ -196,7 +268,7 @@ fs.mkdirSync(shots, { recursive: true });
         json: { error: "Launch selection verified" },
       });
     });
-    await page.getByRole("button", { name: "Play / Resume" }).click();
+    await page.getByRole("button", { name: /^(Play|Resume)$/ }).click();
     await page
       .getByText("Launch selection verified", { exact: true })
       .waitFor();
@@ -223,9 +295,14 @@ fs.mkdirSync(shots, { recursive: true });
     assert.equal(await page.locator("#launch").count(), 0);
     await page.screenshot({ path: shots + "/missing-rom.png" });
     missing = false;
-    await page.getByRole("button", { name: "Check again", exact: true }).click();
-    await page.getByRole("button", { name: "Play / Resume" }).waitFor();
-    assert.equal(await page.getByText("ROM file unavailable", { exact: true }).count(), 0);
+    await page
+      .getByRole("button", { name: "Check again", exact: true })
+      .click();
+    await page.getByRole("button", { name: /^(Play|Resume)$/ }).waitFor();
+    assert.equal(
+      await page.getByText("ROM file unavailable", { exact: true }).count(),
+      0,
+    );
     await page.unroute(/\/api\/game(?:\?|$)/);
     await page.goBack();
     await page.locator(".game-card").first().waitFor();
@@ -257,19 +334,30 @@ fs.mkdirSync(shots, { recursive: true });
       await page.screenshot({
         path: shots + "/gallery-mobile-" + width + ".png",
       });
+      assert.equal(
+        await page.locator("#filters-toggle").getAttribute("aria-expanded"),
+        "false",
+      );
+      await page.locator("#filters-toggle").click();
+      assert(await page.locator("#platform").isVisible());
       for (const density of ["comfortable", "compact"]) {
         await page.locator("#density").selectOption(density);
+        assert.equal(
+          await page.locator(".cover-fallback .fallback-title").count(),
+          0,
+          "title must appear only below the illustration",
+        );
         assert(
-          await page.locator(".game-card .fallback-title").evaluateAll((els) =>
-            els.every((el) => {
-              if (!el.getClientRects().length) return true;
-              const lines =
-                el.getBoundingClientRect().height /
-                parseFloat(getComputedStyle(el).lineHeight);
-              return lines >= 1 && Math.abs(lines - Math.round(lines)) < 0.05;
-            }),
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth,
           ),
-          "fallback text lost complete lines at " + width + " / " + density,
+          "compact gallery overflow",
+        );
+        assert(
+          await page
+            .locator(".game-card-meta")
+            .first()
+            .evaluate((el) => parseFloat(getComputedStyle(el).fontSize) >= 13),
         );
         if (density === "compact")
           await page.screenshot({
@@ -277,6 +365,15 @@ fs.mkdirSync(shots, { recursive: true });
           });
       }
       await page.locator("#density").selectOption("comfortable");
+      await page.keyboard.press("Escape");
+      assert.equal(
+        await page.locator("#filters-toggle").getAttribute("aria-expanded"),
+        "false",
+      );
+      assert.equal(
+        await page.evaluate(() => document.activeElement.id),
+        "filters-toggle",
+      );
     }
     await page.goto(root + "/romm?theme=light#platforms");
     await page.locator(".platform-tile").first().waitFor();
@@ -305,11 +402,64 @@ fs.mkdirSync(shots, { recursive: true });
     );
     assert(
       await page
-        .locator(".detail-artwork .fallback-title")
-        .evaluate((el) => el.getBoundingClientRect().height >= 16),
-      "missing-art title collapsed on a narrow detail cover",
+        .locator("#launch")
+        .evaluate((el) => el.getBoundingClientRect().bottom < innerHeight),
+      "mobile play action should be near the title and version",
     );
+    assert.equal(await page.locator("#launch").textContent(), "Play");
     await page.screenshot({ path: shots + "/detail-mobile.png" });
+    await page.route(/\/api\/game(?:\?|$)/, (route) =>
+      route.fulfill({
+        status: 401,
+        contentType: "text/plain",
+        body: "session expired",
+      }),
+    );
+    await page.reload();
+    await page
+      .getByRole("link", { name: "Reopen Games from Silo", exact: true })
+      .waitFor();
+    assert.equal(
+      await page
+        .getByRole("link", { name: "Reopen Games from Silo", exact: true })
+        .getAttribute("href"),
+      "/",
+    );
+    assert(
+      page.url().includes("#game?id=42"),
+      "session failure must preserve selection",
+    );
+    await page.unroute(/\/api\/game(?:\?|$)/);
+    await page.reload();
+    await page.locator("#launch").waitFor();
+    await page.route(/\/api\/game(?:\?|$)/, async (route) => {
+      const response = await route.fetch();
+      await route.fulfill({
+        response,
+        json: {
+          ...(await response.json()),
+          progress_known: true,
+          resume_available: true,
+        },
+      });
+    });
+    await page.reload();
+    await page.getByRole("button", { name: "Resume", exact: true }).waitFor();
+    await page.unroute(/\/api\/game(?:\?|$)/);
+    await page.locator("#detail-platform").click();
+    await page.locator("#pin-platform").waitFor();
+    assert.match(page.url(), /#games\?platform=1$/);
+    await page.request.post(root + "/romm/api/link", {
+      data: { token: "rmm_development-fixture-token" },
+    });
+    await page.reload();
+    await page.locator("#pin-platform").waitFor();
+    assert.equal(
+      await page.locator("#pin-platform").getAttribute("aria-pressed"),
+      "false",
+      "relink must isolate local preferences",
+    );
+    assert.equal(await page.locator("#unpin-1").count(), 0);
     assert.deepEqual(errors, []);
     console.log(
       "PASS: platform visibility, grouped ROM versions and selected launch, release dates, artwork, gallery filters, detail/back state, touch targets, dark/light and 320px overflow",

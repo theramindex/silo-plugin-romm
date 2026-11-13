@@ -26,7 +26,9 @@ async function api(name, { query, body, signal } = {}) {
   if (!response.ok)
     throw Object.assign(
       new Error(
-        data?.error ||
+        ([401, 403].includes(response.status)
+          ? "Your Silo Games session has expired or no longer has access. Reopen Games from Silo to continue."
+          : data?.error) ||
           ([502, 503, 504].includes(response.status)
             ? "Games is temporarily unavailable. Try again or ask your Silo administrator to check the RomM server connection."
             : "The request could not be completed. Please try again."),
@@ -59,12 +61,134 @@ const library = {
   showEmpty: false,
   iconNames: new Set(),
   ready: false,
+  recent: false,
+  pinned: [],
+  recentPlatforms: [],
+  filtersOpen: false,
+  activity: null,
 };
 const gameURL = (game) => apiURL("art", { id: game.id });
+const needsSiloLaunch = (error) => [401, 403].includes(error?.status);
+function recoveryActions(error, retryID = "") {
+  return needsSiloLaunch(error)
+    ? '<a class="button-link primary" href="/" data-reopen-games>Reopen Games from Silo</a>'
+    : retryID
+      ? '<button id="' + esc(retryID) + '">Try again</button>'
+      : "";
+}
+function prefKey(name, namespace = library.connection?.namespace) {
+  return namespace ? "silo-romm-" + name + ":" + namespace : "";
+}
+function savePreference(name, value, namespace) {
+  const key = prefKey(name, namespace);
+  if (key)
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch {}
+}
+function platformPreference(name) {
+  try {
+    const value = JSON.parse(localStorage.getItem(prefKey(name)) || "[]");
+    return Array.isArray(value)
+      ? [...new Set(value.map(String))].filter((id) =>
+          library.platforms.some((p) => String(p.id) === id),
+        )
+      : [];
+  } catch {
+    return [];
+  }
+}
+function rememberPlatform(id, namespace = library.connection?.namespace) {
+  if (!namespace || !(Number(id) > 0)) return;
+  const key = prefKey("recent-platforms", namespace);
+  let previous = [];
+  try {
+    previous = JSON.parse(localStorage.getItem(key) || "[]");
+  } catch {}
+  const recent = [
+    String(id),
+    ...(Array.isArray(previous) ? previous.map(String) : []).filter(
+      (x) => x !== String(id),
+    ),
+  ].slice(0, 5);
+  savePreference("recent-platforms", recent, namespace);
+  if (namespace === library.connection?.namespace)
+    library.recentPlatforms = recent;
+}
+function headerBrowseState() {
+  let route = location.hash.slice(1);
+  if (route.startsWith("game?"))
+    route = new URLSearchParams(route.slice(5)).get("from") || "games";
+  const q = new URLSearchParams(route.split("?")[1] || "");
+  const recent = q.get("recent") === "true";
+  return {
+    platform: q.get("platform") || "",
+    collection: q.get("collection") || "",
+    search: q.get("search") || "",
+    playable: q.get("playable") === "true",
+    recent,
+    sort: q.get("sort") || (recent ? "last-played" : "name"),
+    offset: 0,
+  };
+}
+function updateHeaderSearch() {
+  const form = $("header-search");
+  if (!form) return;
+  form.hidden = !library.ready;
+  if (!library.ready) return;
+  const scope = headerBrowseState();
+  const platform = library.platforms.find(
+    (p) => String(p.id) === scope.platform,
+  );
+  const collection = library.collections.find(
+    (c) => String(c.id) === scope.collection,
+  );
+  const label = platform?.name || collection?.name || "All games";
+  $("search-scope").textContent = label;
+  $("search-scope").title = label;
+  $("search").setAttribute("aria-label", "Search " + label);
+  $("search").placeholder = "Search games…";
+  if ($("search").value !== scope.search) $("search").value = scope.search;
+  const update = () => {
+    clearTimeout(library.searchTimer);
+    navigateLibrary(
+      browseHash({ ...scope, search: $("search").value, offset: 0 }),
+    );
+  };
+  form.onsubmit = (event) => {
+    event.preventDefault();
+    update();
+  };
+  $("search").oninput = () => {
+    clearTimeout(library.searchTimer);
+    library.searchTimer = setTimeout(update, 350);
+  };
+}
 function shell() {
   $("app").innerHTML =
-    '<header class="app-header"><button id="navigation-toggle" class="navigation-toggle" aria-label="Open library navigation" aria-controls="library-navigation" aria-expanded="false" hidden>Menu</button><a class="home-link" href="/">Silo</a><span class="header-divider"></span><strong>Games</strong><span class="header-spacer"></span><button id="account">Account</button></header><main id="main" tabindex="-1"></main>';
-  $("account").addEventListener("click", accountDialog);
+    '<header class="app-header library-header"><div class="header-brand"><button id="navigation-toggle" class="navigation-toggle" aria-label="Open library navigation" aria-controls="library-navigation" aria-expanded="false" hidden>Menu</button><a class="home-link" href="/">Silo</a><span class="header-divider"></span><strong>Games</strong></div><form id="header-search" class="header-search" role="search" hidden><label class="search-scope" id="search-scope" for="search">All games</label><input id="search" type="search" maxlength="200" placeholder="Search games…" aria-label="Search all games"><button type="submit" aria-label="Search games">' +
+    icon("search") +
+    '</button></form><button id="account">RomM account</button></header><main id="main" tabindex="-1"></main>';
+  $("account").onclick = () =>
+    accountDialog().catch((error) => {
+      notice(error.message, true);
+      showDialog(
+        "<h2>Could not open your account</h2><p>" +
+          esc(error.message) +
+          "</p>" +
+          recoveryActions(error),
+      );
+    });
+  const header = document.querySelector(".library-header");
+  const measure = () =>
+    document.documentElement.style.setProperty(
+      "--header-height",
+      header.getBoundingClientRect().height + "px",
+    );
+  library.headerObserver?.disconnect();
+  library.headerObserver = new ResizeObserver(measure);
+  library.headerObserver.observe(header);
+  measure();
   $("navigation-toggle").onclick = () => {
     const open = $("library-navigation")?.classList.toggle("is-open");
     $("navigation-toggle").setAttribute("aria-expanded", String(!!open));
@@ -73,6 +197,8 @@ function shell() {
 function connectionForm() {
   stopRomMSignIn(true);
   $("navigation-toggle").hidden = true;
+  library.ready = false;
+  $("header-search").hidden = true;
   $("main").innerHTML =
     '<section class="connect"><h1>Connect your games</h1><p>Connect this Silo profile to your RomM account to browse your collection and keep saved progress with you.</p>' +
     (!library.connection.configured
@@ -271,6 +397,10 @@ const icons = {
   back: '<path d="m14 5-7 7 7 7M7 12h14"/>',
   menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
   folder: '<path d="M3 7V5h6l2 2h10v13H3z"/>',
+  pin: '<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9z"/>',
+  close: '<path d="m6 6 12 12M18 6 6 18"/>',
+  filter: '<path d="M4 6h16M7 12h10M10 18h4"/>',
+  history: '<path d="M3 11a9 9 0 1 1 2.8 7M3 4v7h7M12 7v5l3 2"/>',
 };
 function icon(name, cls = "") {
   return (
@@ -302,23 +432,18 @@ function platformArt(p) {
     : icon("games", "platform-icon");
 }
 function coverMarkup(g, detail = false) {
-  const title = titleOf(g),
-    p = library.platforms.find((p) => p.id === g.platform_id) || {
-      name: g.platform_display_name || g.platform_slug,
-      slug: g.platform_slug,
-    };
+  const p = library.platforms.find((p) => p.id === g.platform_id) || {
+    name: g.platform_display_name || g.platform_slug,
+    slug: g.platform_slug,
+  };
   const hasArt = !!(g.path_cover_small || g.path_cover_large);
   return (
     '<span class="cover' +
     (detail ? " detail-cover" : "") +
     '">' +
-    '<span class="cover-fallback">' +
+    '<span class="cover-fallback" aria-hidden="true">' +
     platformArt(p) +
-    '<span class="fallback-title">' +
-    esc(title) +
-    '</span><span class="fallback-platform">' +
-    esc(p.name || "Game") +
-    "</span></span>" +
+    "</span>" +
     (hasArt
       ? '<img class="game-art" data-art src="' +
         esc(gameURL(g)) +
@@ -344,7 +469,9 @@ function browseHash(next = {}) {
   for (const k of ["platform", "collection", "search"])
     if (state[k]) q.set(k, state[k]);
   if (state.playable) q.set("playable", "true");
-  if (state.sort !== "name") q.set("sort", state.sort);
+  if (state.recent) q.set("recent", "true");
+  if (state.sort !== (state.recent ? "last-played" : "name"))
+    q.set("sort", state.sort);
   if (state.offset) q.set("offset", state.offset);
   return "games" + (q.size ? "?" + q : "");
 }
@@ -363,15 +490,30 @@ function readBrowseRoute() {
   library.collection = q.get("collection") || "";
   library.search = q.get("search") || "";
   library.playable = q.get("playable") === "true";
-  library.sort = ["name", "name-desc", "newest"].includes(q.get("sort"))
+  library.recent = q.get("recent") === "true";
+  library.sort = [
+    "name",
+    "name-desc",
+    "newest",
+    ...(library.recent ? ["last-played"] : []),
+  ].includes(q.get("sort"))
     ? q.get("sort")
-    : "name";
+    : library.recent
+      ? "last-played"
+      : "name";
   library.offset = Math.min(100000, Math.max(0, Number(q.get("offset")) || 0));
   return q;
 }
 async function loadLibrary() {
   library.ready = false;
+  library.pinned = [];
+  library.recentPlatforms = [];
+  library.activity = null;
+  library.filtersOpen = false;
+  library.density = "comfortable";
+  library.showEmpty = false;
   $("navigation-toggle").hidden = true;
+  $("header-search").hidden = true;
   notice("");
   $("main").className = "library-shell";
   $("main").innerHTML =
@@ -398,6 +540,10 @@ async function loadLibrary() {
           "silo-romm-empty-platforms:" + library.connection.namespace,
         ) === "true";
     } catch {}
+    if (!["comfortable", "compact"].includes(library.density))
+      library.density = "comfortable";
+    library.pinned = platformPreference("pinned-platforms");
+    library.recentPlatforms = platformPreference("recent-platforms");
     $("main").innerHTML =
       '<div class="library-layout"><aside id="library-navigation" class="library-rail" aria-label="Game library"></aside><section id="library-content" class="library-content" aria-label="Library content"></section></div>';
     library.ready = true;
@@ -408,14 +554,104 @@ async function loadLibrary() {
     $("main").innerHTML =
       '<div class="empty library-failure"><h1>Could not open your library</h1><p>' +
       esc(error.message) +
-      '</p><button id="retry-library">Try again</button></div>';
-    $("retry-library").onclick = loadLibrary;
+      "</p>" +
+      recoveryActions(error, "retry-library") +
+      "</div>";
+    if ($("retry-library")) $("retry-library").onclick = loadLibrary;
   }
 }
 function visiblePlatforms() {
   return library.platforms.filter(
     (p) =>
       library.showEmpty || p.rom_count > 0 || String(p.id) === library.platform,
+  );
+}
+function personalPlatformNavigation() {
+  const group = (title, ids, pinned) => {
+    const rows = ids
+      .map((id) => library.platforms.find((p) => String(p.id) === id))
+      .filter(Boolean);
+    return rows.length
+      ? '<h2 class="rail-heading">' +
+          title +
+          '</h2><nav class="personal-platforms" aria-label="' +
+          title +
+          '">' +
+          rows
+            .map(
+              (p) =>
+                '<div class="personal-platform-row"><button data-platform="' +
+                p.id +
+                '">' +
+                platformArt(p) +
+                "<span>" +
+                esc(p.name) +
+                "</span></button>" +
+                (pinned
+                  ? '<button class="unpin-platform" id="unpin-' +
+                    p.id +
+                    '" data-pin="' +
+                    p.id +
+                    '" aria-label="Unpin ' +
+                    esc(p.name) +
+                    '">' +
+                    icon("close") +
+                    "</button>"
+                  : "") +
+                "</div>",
+            )
+            .join("") +
+          "</nav>"
+      : "";
+  };
+  return (
+    group("Pinned platforms", library.pinned, true) +
+    group(
+      "Recent platforms",
+      library.recentPlatforms.filter((id) => !library.pinned.includes(id)),
+      false,
+    )
+  );
+}
+function pinButton(p) {
+  const pinned = library.pinned.includes(String(p.id));
+  return (
+    '<button id="pin-platform" class="pin-platform" data-pin="' +
+    p.id +
+    '" aria-pressed="' +
+    pinned +
+    '" aria-label="' +
+    (pinned ? "Unpin " : "Pin ") +
+    esc(p.name) +
+    '">' +
+    icon("pin") +
+    (pinned ? "Pinned" : "Pin platform") +
+    "</button>"
+  );
+}
+function bindPinButtons(scope = document) {
+  scope.querySelectorAll("[data-pin]").forEach(
+    (button) =>
+      (button.onclick = () => {
+        const id = button.dataset.pin;
+        const p = library.platforms.find((p) => String(p.id) === id);
+        if (!p) return;
+        const wasPinned = library.pinned.includes(id);
+        library.pinned = wasPinned
+          ? library.pinned.filter((x) => x !== id)
+          : [...library.pinned, id];
+        savePreference("pinned-platforms", library.pinned);
+        renderLibraryNavigation();
+        if ($("pin-platform")?.dataset.pin === id) {
+          $("pin-platform").outerHTML = pinButton(p);
+          bindPinButtons($("library-content"));
+        }
+        if (!button.isConnected)
+          ($("pin-platform") || $("platform-search"))?.focus({
+            preventScroll: true,
+          });
+        notice((wasPinned ? "Unpinned " : "Pinned ") + p.name + ".");
+      }),
   );
 }
 function renderLibraryNavigation() {
@@ -433,16 +669,28 @@ function renderLibraryNavigation() {
       library.view === "games" &&
         !library.platform &&
         !library.collection &&
-        !library.playable,
+        !library.playable &&
+        !library.recent,
     ) +
     ">" +
     icon("games") +
     "All games</button>" +
     '<button data-route="games?playable=true"' +
-    active(library.view === "games" && library.playable && !library.platform) +
+    active(
+      library.view === "games" &&
+        library.playable &&
+        !library.platform &&
+        !library.recent,
+    ) +
     ">" +
     icon("play") +
-    "Play in Silo</button></nav>" +
+    "Play in Silo</button>" +
+    '<button data-route="games?recent=true&playable=true"' +
+    active(library.view === "games" && library.recent) +
+    ">" +
+    icon("history") +
+    "Continue playing</button></nav>" +
+    personalPlatformNavigation() +
     (library.collections.length
       ? '<h2 class="rail-heading">Collections</h2><nav class="collection-nav" aria-label="Collections">' +
         library.collections
@@ -478,6 +726,14 @@ function renderLibraryNavigation() {
     renderPlatformLinks();
   };
   renderPlatformLinks();
+  nav
+    .querySelectorAll(".personal-platforms [data-platform]")
+    .forEach(
+      (button) =>
+        (button.onclick = () =>
+          navigateLibrary("games?platform=" + button.dataset.platform)),
+    );
+  bindPinButtons(nav);
 }
 function renderPlatformLinks() {
   const rows = visiblePlatforms().filter((p) =>
@@ -518,8 +774,17 @@ async function renderLibraryRoute() {
   ++library.generation;
   clearTimeout(library.searchTimer);
   const q = readBrowseRoute();
+  if (
+    library.view === "games" &&
+    library.platform &&
+    library.platform !== library.lastVisitedPlatform
+  )
+    rememberPlatform(library.platform);
+  library.lastVisitedPlatform =
+    library.view === "games" ? library.platform : "";
   notice("");
   renderLibraryNavigation();
+  updateHeaderSearch();
   if (library.view === "game") {
     await renderGameDetail(q.get("id"), q.get("from"));
     return;
@@ -530,22 +795,37 @@ async function renderLibraryRoute() {
   }
   renderGallery();
   if (
-    ["search", "sort", "collection", "playable", "platform"].includes(focusID)
+    [
+      "search",
+      "sort",
+      "collection",
+      "playable",
+      "platform",
+      "density",
+      "filters-toggle",
+    ].includes(focusID)
   ) {
     $(focusID)?.focus({ preventScroll: true });
     if (focusID === "search" && selection != null)
       $(focusID)?.setSelectionRange(selection, selection);
   }
+  if (library.restoreControl) {
+    $(library.restoreControl)?.focus({ preventScroll: true });
+    library.restoreControl = null;
+  }
   await loadGames();
 }
 function renderPlatformOverview() {
   $("library-content").innerHTML =
-    '<header class="library-heading"><div><h1>Your platforms</h1><p>Choose a system. Find your next game.</p></div><span class="library-total">' +
+    '<header class="library-heading"><h1>Your library</h1><span class="library-total">' +
     countText(visiblePlatforms().length) +
     " platforms · " +
     countText(library.platforms.reduce((n, p) => n + p.rom_count, 0)) +
     " ROMs</span></header>" +
-    '<div class="overview-controls"><label class="overview-search">' +
+    '<section class="continue-section" aria-labelledby="continue-heading"><div class="section-heading"><h2 id="continue-heading">Continue playing</h2><button class="text-button" id="view-recent">View all ' +
+    icon("history") +
+    '</button></div><div id="continue-games" class="continue-games" aria-live="polite"></div></section>' +
+    '<div class="section-heading platforms-heading"><h2>Platforms</h2></div><div class="overview-controls"><label class="overview-search">' +
     icon("search") +
     '<input id="overview-search" aria-label="Search platforms" type="search" placeholder="Search your platforms" value="' +
     esc(library.overviewSearch || "") +
@@ -569,6 +849,81 @@ function renderPlatformOverview() {
     $("show-empty-platforms").focus({ preventScroll: true });
   };
   renderPlatformGroups(library.overviewSearch || "");
+  $("view-recent").onclick = () =>
+    navigateLibrary("games?recent=true&playable=true");
+  loadContinuePlaying();
+}
+async function loadContinuePlaying() {
+  const target = $("continue-games");
+  if (!target) return;
+  const gen = library.generation;
+  target.innerHTML =
+    '<p class="activity-empty" role="status">Loading recent games…</p>';
+  try {
+    const games =
+      library.activity ||
+      (
+        await api("games", {
+          query: { recent: true, playable: true, sort: "last-played" },
+        })
+      ).items ||
+      [];
+    if (gen !== library.generation || !target.isConnected) return;
+    library.activity = games.filter((g) => g.rom_user?.last_played && g.core);
+    target.innerHTML = library.activity.length
+      ? '<div class="activity-grid">' +
+        library.activity.slice(0, 6).map(gameCardMarkup).join("") +
+        "</div>"
+      : '<p class="activity-empty">Your recently played games on supported systems will appear here.</p>';
+    hydrateArtwork(target);
+    bindGameCards(target);
+  } catch (error) {
+    if (gen !== library.generation || !target.isConnected) return;
+    target.innerHTML =
+      '<p class="activity-empty">' +
+      esc(error.message) +
+      "</p>" +
+      recoveryActions(error, "retry-activity");
+    if ($("retry-activity")) $("retry-activity").onclick = loadContinuePlaying;
+  }
+}
+function gameCardMarkup(g) {
+  const playable = g.core && g.has_file_on_disk !== false;
+  return (
+    '<button type="button" class="game-card" data-game="' +
+    g.id +
+    '" aria-label="' +
+    esc(
+      titleOf(g) +
+        ", " +
+        (g.platform_display_name || g.platform_slug) +
+        (playable ? ", supported in Silo" : ""),
+    ) +
+    '">' +
+    coverMarkup(g) +
+    '<span class="game-card-title">' +
+    esc(titleOf(g)) +
+    '</span><span class="game-card-meta"><span>' +
+    esc(g.platform_display_name || g.platform_slug) +
+    "</span>" +
+    (g.version_count > 1
+      ? '<span class="version-count">' + g.version_count + " versions</span>"
+      : "") +
+    (playable
+      ? '<span class="play-indicator" title="Supported in Silo">' +
+        icon("play") +
+        '<span class="sr-only">Supported in Silo</span></span>'
+      : "") +
+    "</span></button>"
+  );
+}
+function bindGameCards(scope) {
+  scope
+    .querySelectorAll("[data-game]")
+    .forEach(
+      (button) =>
+        (button.onclick = () => openGame(Number(button.dataset.game), button)),
+    );
 }
 function renderPlatformGroups(search) {
   const rows = visiblePlatforms().filter((p) =>
@@ -634,7 +989,18 @@ function renderGallery() {
   const title =
     platform?.name ||
     collection?.name ||
-    (library.playable ? "Play in Silo" : "All games");
+    (library.recent
+      ? "Continue playing"
+      : library.playable
+        ? "Play in Silo"
+        : "All games");
+  const chips = [
+    ["platform", platform?.name],
+    ["collection", collection?.name],
+    ["search", library.search && "Search: " + library.search],
+    ["playable", library.playable && "Playable in Silo"],
+    ["recent", library.recent && "Recently played"],
+  ].filter(([, label]) => label);
   $("library-content").innerHTML =
     '<header class="library-heading gallery-heading"><div><button class="breadcrumb text-button" data-home>' +
     icon("back") +
@@ -642,20 +1008,25 @@ function renderGallery() {
     esc(title) +
     "</h1></div>" +
     (platform
-      ? '<span class="heading-platform-art">' +
+      ? '<div class="platform-heading-actions"><span class="heading-platform-art">' +
         platformArt(platform) +
-        "</span>"
+        "</span>" +
+        pinButton(platform) +
+        "</div>"
       : "") +
     "</header>" +
-    '<form id="filters" class="gallery-toolbar"><label class="game-search">Search games<input id="search" type="search" placeholder="Search games in this library" maxlength="200" value="' +
-    esc(library.search) +
-    '"></label>' +
-    '<label class="mobile-platform">Platform<select id="platform"><option value="">All platforms</option>' +
+    '<div class="gallery-toolbar"><p id="result-count" role="status"></p><button id="filters-toggle" aria-controls="filter-fields" aria-expanded="' +
+    library.filtersOpen +
+    '">' +
+    icon("filter") +
+    "Filters</button>" +
+    '<div id="filter-fields" class="filter-fields' +
+    (library.filtersOpen ? " is-open" : "") +
+    '"><label class="mobile-platform">Platform<select id="platform"><option value="">All platforms</option>' +
     visiblePlatforms()
       .map((p) => '<option value="' + p.id + '">' + esc(p.name) + "</option>")
       .join("") +
     "</select></label>" +
-    '<label>Sort<select id="sort"><option value="name">Name A–Z</option><option value="name-desc">Name Z–A</option><option value="newest">Recently added</option></select></label>' +
     (library.collections.length
       ? '<label>Collection<select id="collection"><option value="">All collections</option>' +
         library.collections
@@ -665,25 +1036,48 @@ function renderGallery() {
           .join("") +
         "</select></label>"
       : "") +
-    '<button class="search-submit" type="submit">Search</button></form>' +
-    '<div class="gallery-options"><label class="playable-toggle"><input id="playable" type="checkbox"' +
+    '<label class="playable-toggle"><input id="playable" type="checkbox"' +
     (library.playable ? " checked" : "") +
     '>Playable in Silo</label><label class="density-control">Covers<select id="density" aria-label="Cover size"><option value="comfortable">Large</option><option value="compact">Small</option></select></label></div>' +
-    '<div class="results-head"><p id="result-count" role="status"></p><span class="controller-hint">D-pad to browse · A to open · B to go back</span></div><div id="grid" class="game-grid" data-density="' +
-    (library.density === "compact" ? "compact" : "comfortable") +
+    '<label class="sort-control"><span class="sr-only">Sort</span><select id="sort" aria-label="Sort">' +
+    (library.recent ? '<option value="last-played">Last played</option>' : "") +
+    '<option value="name">Name A–Z</option><option value="name-desc">Name Z–A</option><option value="newest">Recently added</option></select></label></div>' +
+    '<div class="active-filters" aria-label="Active filters">' +
+    chips
+      .map(
+        ([key, label]) =>
+          '<button class="filter-chip" data-clear="' +
+          key +
+          '" aria-label="Remove ' +
+          esc(label) +
+          '">' +
+          esc(label) +
+          icon("close") +
+          "</button>",
+      )
+      .join("") +
+    "</div>" +
+    '<div id="grid" class="game-grid" data-density="' +
+    library.density +
     '" aria-label="Games"></div><nav id="pagination" aria-label="Game pages"></nav>';
   $("library-content").querySelector("[data-home]").onclick = () =>
     navigateLibrary("platforms");
+  bindPinButtons($("library-content"));
   $("platform").value = library.platform;
   $("sort").value = library.sort;
   if ($("collection")) $("collection").value = library.collection;
-  $("density").value =
-    library.density === "compact" ? "compact" : "comfortable";
-  const update = () => {
-    clearTimeout(library.searchTimer);
+  $("density").value = library.density;
+  $("filters-toggle").onclick = () => {
+    library.filtersOpen = !library.filtersOpen;
+    $("filter-fields").classList.toggle("is-open", library.filtersOpen);
+    $("filters-toggle").setAttribute(
+      "aria-expanded",
+      String(library.filtersOpen),
+    );
+  };
+  const update = () =>
     navigateLibrary(
       browseHash({
-        search: $("search").value,
         platform: $("platform").value,
         collection: $("collection")?.value || "",
         sort: $("sort").value,
@@ -691,17 +1085,24 @@ function renderGallery() {
         offset: 0,
       }),
     );
-  };
-  $("filters").onsubmit = (e) => {
-    e.preventDefault();
-    update();
-  };
-  $("search").oninput = () => {
-    clearTimeout(library.searchTimer);
-    library.searchTimer = setTimeout(update, 350);
-  };
   for (const id of ["platform", "sort", "collection", "playable"])
     if ($(id)) $(id).onchange = update;
+  document.querySelectorAll("[data-clear]").forEach(
+    (button) =>
+      (button.onclick = () => {
+        const key = button.dataset.clear;
+        library.restoreControl = "search";
+        navigateLibrary(
+          browseHash({
+            [key]: ["recent", "playable"].includes(key) ? false : "",
+            ...(key === "recent" && library.sort === "last-played"
+              ? { sort: "name" }
+              : {}),
+            offset: 0,
+          }),
+        );
+      }),
+  );
   $("density").onchange = () => {
     library.density = $("density").value;
     $("grid").dataset.density = library.density;
@@ -736,6 +1137,7 @@ async function loadGames() {
         offset: library.offset,
         sort: library.sort,
         playable: library.playable,
+        recent: library.recent,
       },
       signal: library.abort.signal,
     });
@@ -747,38 +1149,7 @@ async function loadGames() {
       countText(page.total ?? games.length) +
       ((page.total ?? games.length) === 1 ? " game" : " games");
     grid.innerHTML = games.length
-      ? games
-          .map(
-            (g) =>
-              '<button type="button" class="game-card" data-game="' +
-              g.id +
-              '" aria-label="' +
-              esc(
-                titleOf(g) +
-                  ", " +
-                  (g.platform_display_name || g.platform_slug) +
-                  (g.core ? ", playable in Silo" : ""),
-              ) +
-              '">' +
-              coverMarkup(g) +
-              '<span class="game-card-title">' +
-              esc(titleOf(g)) +
-              '</span><span class="game-card-meta"><span>' +
-              esc(g.platform_display_name || g.platform_slug) +
-              "</span>" +
-              (g.version_count > 1
-                ? '<span class="version-count">' +
-                  g.version_count +
-                  " versions</span>"
-                : "") +
-              (g.core && g.has_file_on_disk !== false
-                ? '<span class="play-indicator" title="Playable in Silo">' +
-                  icon("play") +
-                  '<span class="sr-only">Playable in Silo</span></span>'
-                : "") +
-              "</span></button>",
-          )
-          .join("")
+      ? games.map(gameCardMarkup).join("")
       : '<div class="empty"><h2>' +
         (library.playable ? "No playable games here" : "No games found") +
         "</h2><p>" +
@@ -787,9 +1158,7 @@ async function loadGames() {
           : "Try another search, platform, or collection.") +
         '</p><button id="clear-filters">Clear filters</button></div>';
     hydrateArtwork(grid);
-    grid
-      .querySelectorAll("[data-game]")
-      .forEach((b) => (b.onclick = () => openGame(Number(b.dataset.game), b)));
+    bindGameCards(grid);
     if ($("clear-filters"))
       $("clear-filters").onclick = () => navigateLibrary("games");
     const total = page.total ?? games.length;
@@ -841,8 +1210,10 @@ async function loadGames() {
       grid.innerHTML =
         '<div class="empty"><h2>Could not load your collection</h2><p>' +
         esc(error.message) +
-        '</p><button id="retry">Try again</button></div>';
-      $("retry").onclick = loadGames;
+        "</p>" +
+        recoveryActions(error, "retry") +
+        "</div>";
+      if ($("retry")) $("retry").onclick = loadGames;
     }
   } finally {
     if (gen === library.generation && grid.isConnected)
@@ -857,7 +1228,7 @@ async function openGame(id, button) {
     "game?id=" +
       id +
       "&from=" +
-      encodeURIComponent(location.hash.slice(1) || "games"),
+      encodeURIComponent(location.hash.slice(1) || "platforms"),
   );
 }
 function backToLibrary(from) {
@@ -915,26 +1286,40 @@ async function renderGameDetail(id, from) {
       icon("back") +
       'Back to library</button><article class="game-detail-page"><aside class="detail-artwork">' +
       coverMarkup(g, true) +
-      '</aside><div class="detail-main"><h1 tabindex="-1" id="game-heading">' +
+      '</aside><header class="detail-identity"><h1 tabindex="-1" id="game-heading">' +
       esc(titleOf(g)) +
       '</h1><p class="game-platform">' +
+      '<button class="text-button detail-platform-link" id="detail-platform" aria-label="Browse ' +
       esc(g.platform_display_name || g.platform_slug) +
-      "</p>" +
+      '">' +
+      platformArt({ slug: g.platform_slug }) +
+      esc(g.platform_display_name || g.platform_slug) +
+      "</button></p>" +
       (m.genres?.length
         ? '<p class="game-genres">' + m.genres.map(esc).join(" · ") + "</p>"
         : "") +
+      '</header><section class="detail-play" aria-label="Play this game">' +
       versionPicker +
       '<div class="detail-actions">' +
       (g.has_file_on_disk === false
-        ? '<p class="unsupported-message"><strong>ROM file unavailable</strong><br>This ROM file is missing from RomM’s storage. Check that its library is mounted, then check again.' +
-          (versions.length > 1 ? " You can also try another ROM version." : "") +
+        ? '<p class="unsupported-message"><strong>ROM file unavailable</strong><br>RomM marks this file as unavailable. Check its library storage, run a quick scan in RomM, then choose Check again.' +
+          (versions.length > 1
+            ? " You can also try another ROM version."
+            : "") +
           '</p><button id="retry-game">Check again</button>'
         : g.core
-        ? '<button id="launch" class="primary">' +
-          icon("play") +
-          "Play / Resume</button><p>Play here with your connected RomM account. Your compatible saved progress resumes automatically.</p>"
-        : '<p class="unsupported-message">This platform is available to browse. Browser play in Silo supports NES, SNES, Game Boy, Game Boy Color, and Game Boy Advance.</p>') +
-      '<p id="launch-status" role="status"></p></div><section class="game-about"><h2>About this game</h2><p class="game-summary">' +
+          ? '<button id="launch" class="primary">' +
+            icon("play") +
+            (g.progress_known && g.resume_available ? "Resume" : "Play") +
+            "</button><p>" +
+            (g.progress_known
+              ? g.resume_available
+                ? "Resume compatible saved progress from your connected RomM account."
+                : "Play here with your connected RomM account."
+              : "Saved progress will be checked again before launch.") +
+            "</p>"
+          : '<p class="unsupported-message">This platform is available to browse. Browser play in Silo supports NES, SNES, Game Boy, Game Boy Color, and Game Boy Advance.</p>') +
+      '<p id="launch-status" role="status"></p></div></section><div class="detail-description"><section class="game-about"><h2>About this game</h2><p class="game-summary">' +
       esc(g.summary || "RomM has no description for this game yet.") +
       "</p></section>" +
       '<dl class="game-facts">' +
@@ -949,11 +1334,19 @@ async function renderGameDetail(id, from) {
       "</dd>" +
       (g.fs_size_bytes
         ? "<dt>Size</dt><dd>" +
-          countText(Math.round((g.fs_size_bytes / 1048576) * 10) / 10) +
-          " MB</dd>"
+          countText(
+            Math.round(
+              (g.fs_size_bytes / (g.fs_size_bytes < 1048576 ? 1024 : 1048576)) *
+                10,
+            ) / 10,
+          ) +
+          (g.fs_size_bytes < 1048576 ? " KB</dd>" : " MB</dd>")
         : "") +
       "</dl></details></div></article>";
     $("back-library").onclick = () => backToLibrary(from);
+    if ($("detail-platform"))
+      $("detail-platform").onclick = () =>
+        navigateLibrary("games?platform=" + g.platform_id);
     if ($("retry-game")) $("retry-game").onclick = renderLibraryRoute;
     hydrateArtwork(content);
     if (library.focusVersion && $("rom-version")) {
@@ -985,14 +1378,17 @@ async function renderGameDetail(id, from) {
         $("launch-status").textContent = "Checking saved progress…";
         try {
           const session = await api("play", { body: { id: g.id } });
-          location.assign(
-            new URL(
-              "play?session=" + encodeURIComponent(session.id),
-              document.baseURI,
-            ),
-          );
+          const url = new URL("play", document.baseURI);
+          url.searchParams.set("session", session.id);
+          url.searchParams.set("game", g.id);
+          url.searchParams.set("from", from || "games");
+          const theme = new URLSearchParams(location.search).get("theme");
+          if (theme) url.searchParams.set("theme", theme);
+          location.assign(url);
         } catch (error) {
-          $("launch-status").textContent = error.message;
+          $("launch-status").innerHTML =
+            esc(error.message) +
+            (needsSiloLaunch(error) ? "<br>" + recoveryActions(error) : "");
           launch.disabled = false;
         }
       };
@@ -1003,7 +1399,10 @@ async function renderGameDetail(id, from) {
     content.innerHTML =
       '<div class="empty"><h1>Could not open this game</h1><p>' +
       esc(error.message) +
-      '</p><button id="back-library">Back to library</button></div>';
+      "</p>" +
+      recoveryActions(error, "retry-game") +
+      '<button id="back-library">Back to library</button></div>';
+    if ($("retry-game")) $("retry-game").onclick = renderLibraryRoute;
     $("back-library").onclick = () => backToLibrary(from);
   }
 }
@@ -1062,6 +1461,17 @@ document.addEventListener("keydown", (event) => {
     $("library-navigation").classList.remove("is-open");
     $("navigation-toggle").setAttribute("aria-expanded", "false");
     $("navigation-toggle").focus();
+    return;
+  }
+  if (
+    event.key === "Escape" &&
+    library.filtersOpen &&
+    $("filters-toggle")?.offsetWidth
+  ) {
+    library.filtersOpen = false;
+    $("filter-fields").classList.remove("is-open");
+    $("filters-toggle").setAttribute("aria-expanded", "false");
+    $("filters-toggle").focus();
     return;
   }
   if (event.key === "Escape" && library.view === "game" && !$("detail")?.open) {
@@ -1302,10 +1712,19 @@ async function fetchBinary(kind) {
     { credentials: "same-origin" },
   );
   if (!r.ok)
-    throw new Error(
-      "Could not download " +
-        kind +
-        ". Check RomM access and the Silo stream relay.",
+    throw Object.assign(
+      new Error(
+        [401, 403].includes(r.status)
+          ? "Your Silo Games session has expired. Reopen Games from Silo to continue."
+          : r.status === 404 && kind === "rom"
+            ? "The selected ROM file is unavailable. Check RomM’s library storage and run a quick scan before trying again."
+            : "Could not load " +
+              (kind === "rom"
+                ? "the selected ROM"
+                : "compatible saved progress") +
+              ". Check the RomM connection and try again.",
+      ),
+      { status: r.status },
     );
   return new Uint8Array(await r.arrayBuffer());
 }
@@ -1384,6 +1803,7 @@ async function startPlayer() {
   };
   window.EJS_onGameStart = () => {
     player.started = true;
+    rememberPlatform(s.game.platform_id, s.generation);
     $("player-loading").hidden = true;
     if (saveData && !window.EJS_loadStateURL) {
       const manager = window.EJS_emulator.gameManager;
@@ -1437,7 +1857,7 @@ async function saveExit() {
     await queueSave();
     await api("stop", { body: { session: player.session.id } });
     player.started = false;
-    location.assign(new URL("./#games", document.baseURI));
+    location.assign(playerLibraryURL());
   } catch (error) {
     player.saving = false;
     player.timer = setInterval(() => {
@@ -1451,7 +1871,7 @@ async function saveExit() {
     $("retry-exit").onclick = saveExit;
     $("local-exit").onclick = () => {
       player.started = false;
-      location.assign(new URL("./#games", document.baseURI));
+      location.assign(playerLibraryURL());
     };
   }
 }
@@ -1474,6 +1894,17 @@ window.addEventListener("beforeunload", (event) => {
     event.returnValue = "";
   }
 });
+function playerLibraryURL() {
+  const q = new URLSearchParams(location.search);
+  const id = player.session?.game?.id || Number(q.get("game"));
+  const from = q.get("from") || "games";
+  const url = new URL("./", document.baseURI);
+  const theme = q.get("theme");
+  if (theme) url.searchParams.set("theme", theme);
+  url.hash =
+    id > 0 ? "game?id=" + id + "&from=" + encodeURIComponent(from) : "games";
+  return url;
+}
 async function boot() {
   try {
     if (location.pathname.endsWith("/play")) await startPlayer();
@@ -1485,12 +1916,23 @@ async function boot() {
     }
     requestAnimationFrame(gamepadFrame);
   } catch (error) {
-    $("app").innerHTML =
-      '<main class="connect"><h1>Could not open Games</h1><p>' +
+    if (player.session && !player.started) {
+      try {
+        await api("stop", { body: { session: player.session.id } });
+      } catch {}
+    }
+    $("app").classList.remove("is-player");
+    shell();
+    $("main").innerHTML =
+      '<section class="connect"><h1>Could not open Games</h1><p>' +
       esc(error.message) +
-      '</p><a href="' +
-      esc(new URL("./", document.baseURI)) +
-      '">Back to Games</a></main>';
+      "</p>" +
+      (needsSiloLaunch(error)
+        ? recoveryActions(error)
+        : '<a class="button-link" href="' +
+          esc(playerLibraryURL()) +
+          '">Back to selected game</a>') +
+      "</section>";
     notice(error.message, true);
   }
 }

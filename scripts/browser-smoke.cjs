@@ -186,7 +186,7 @@ fs.mkdirSync(shots, { recursive: true });
     });
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.locator(".game-card").click();
-    await page.getByRole("button", { name: "Play / Resume" }).click();
+    await page.getByRole("button", { name: /^(Play|Resume)$/ }).click();
     await page.waitForFunction(
       () => window.EJS_emulator?.started,
       {},
@@ -235,9 +235,9 @@ fs.mkdirSync(shots, { recursive: true });
     await page
       .getByRole("button", { name: "Save & exit", exact: true })
       .click();
-    await page.locator(".game-card").waitFor();
-    await page.locator(".game-card").click();
-    await page.getByRole("button", { name: "Play / Resume" }).click();
+    await page.getByRole("button", { name: "Resume", exact: true }).waitFor();
+    assert.equal(new URL(page.url()).searchParams.get("theme"), "light");
+    await page.getByRole("button", { name: "Resume", exact: true }).click();
     await page.waitForFunction(
       () => window.EJS_emulator?.started,
       {},
@@ -270,6 +270,37 @@ fs.mkdirSync(shots, { recursive: true });
       ),
       false,
     );
+    await page
+      .getByRole("button", { name: "Save & exit", exact: true })
+      .click();
+    await page.locator("#launch").waitFor();
+    await page.route("**/api/content?*", (route) =>
+      new URL(route.request().url()).searchParams.get("kind") === "rom"
+        ? route.fulfill({ status: 404, body: "missing" })
+        : route.continue(),
+    );
+    const stopped = page.waitForResponse(
+      (r) => r.url().includes("/api/stop?") && r.status() === 200,
+    );
+    await page.locator("#launch").click();
+    await page
+      .getByRole("heading", { name: "Could not open Games", exact: true })
+      .waitFor();
+    await stopped;
+    const back = page.getByRole("link", {
+      name: "Back to selected game",
+      exact: true,
+    });
+    const backURL = new URL(await back.getAttribute("href"));
+    assert.equal(backURL.searchParams.get("theme"), "light");
+    assert.match(backURL.hash, /^#game\?id=42&from=/);
+    assert.match(
+      await page.locator("#main").textContent(),
+      /library storage.*quick scan/,
+    );
+    await page.unroute("**/api/content?*");
+    await back.click();
+    await page.getByRole("button", { name: "Resume", exact: true }).waitFor();
     assert.deepEqual(errors, []);
     console.log(
       "PASS: browser sign-in approval/cancel/decline, browse, mobile/light layout, emulator boot, isolated storage, save, resume, failed-sync outbox and retry",

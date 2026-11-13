@@ -14,3 +14,9 @@ Each verified Silo account/profile links explicitly to its own RomM identity.
 Credentials stay on the server, links persist encrypted, and player tickets,
 local storage and upload ownership remain bound to that connection. No iframe,
 name-based user matching, shared admin credentials or browser token exposure.
+
+The Games header and navigation stay visible while browsing. Scoped search and a
+compact toolbar prioritize covers; mobile secondary filters expand on demand.
+Pinned/recent platforms are local connection preferences. Continue playing uses
+RomM’s own per-user history and opens the exact played ROM. Resume appears only
+when compatible progress is known; checking details never reserves a game session.
