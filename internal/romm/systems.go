@@ -58,13 +58,14 @@ var systems = func() map[string]System {
 			continue
 		}
 		s := System{Name: name, Core: name, Cores: []string{name}, RequiresThreads: c.Options.Threads, RequiresWebGL2: name == "ppsspp"}
+	matched:
 		for _, candidate := range catalog.Systems {
 			for _, core := range candidate.Cores {
 				if core == name {
 					s.Name = candidate.Name
 					s.RequiresBIOS = candidate.RequiresBIOS
 					s.BIOSHint = candidate.BIOSHint
-					break
+					break matched
 				}
 			}
 		}
