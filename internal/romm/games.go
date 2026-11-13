@@ -28,6 +28,8 @@ type Platform struct {
 	Core         string `json:"core,omitempty"`
 }
 type Collection struct {
+	Key   string `json:"key"`
+	Kind  string `json:"kind"`
 	ID    int64  `json:"id"`
 	Name  string `json:"name"`
 	Count int    `json:"rom_count"`
@@ -110,6 +112,7 @@ type BrowseQuery struct {
 	Search, Platform, Collection, Offset, Sort string
 	Playable                                   bool
 	Recent                                     bool
+	Favorite                                   bool
 }
 
 var fileExtension = regexp.MustCompile(`(?i)\.(zip|rar|7z|nes|sfc|smc|gb|gbc|gba|n64|z64|nds|3ds|iso|bin|cue|chd|cso|pkg|nsp|xci|gcm|md|sms|gg|pce|pbp|wad|wbfs|rvz|wud|wux)$`)
@@ -175,13 +178,33 @@ func (e *Engine) Platforms(ctx context.Context, owner string) ([]Platform, error
 	return out, err
 }
 func (e *Engine) Collections(ctx context.Context, owner string) ([]Collection, error) {
-	var out []Collection
-	err := e.JSON(ctx, owner, "/api/collections", &out)
-	return out, err
+	out := []Collection{}
+	for _, kind := range []string{"standard", "smart"} {
+		path := "/api/collections"
+		if kind == "smart" {
+			path += "/smart"
+		}
+		var rows []Collection
+		if err := e.JSON(ctx, owner, path, &rows); err != nil {
+			return nil, err
+		}
+		for _, row := range rows {
+			row.Kind = kind
+			row.Key = strconv.FormatInt(row.ID, 10)
+			if kind == "smart" {
+				row.Key = "smart:" + row.Key
+			}
+			out = append(out, row)
+		}
+	}
+	return out, nil
 }
 func (e *Engine) Games(ctx context.Context, owner string, browse BrowseQuery) (Page, error) {
 	search, platform, collection, offset := browse.Search, browse.Platform, browse.Collection, browse.Offset
 	q := url.Values{"limit": {"48"}, "with_rom_id_index": {"false"}, "with_filter_values": {"false"}, "group_by_meta_id": {"true"}}
+	if browse.Favorite {
+		q.Set("favorite", "true")
+	}
 	if browse.Recent {
 		q.Set("last_played", "true")
 		q.Set("group_by_meta_id", "false") // History must retain the actual played ROM version.
@@ -211,7 +234,12 @@ func (e *Engine) Games(ctx context.Context, owner string, browse BrowseQuery) (P
 	if len(search) > 200 {
 		search = search[:200]
 	}
-	for key, value := range map[string]string{"platform_ids": platform, "collection_id": collection} {
+	collectionKey := "collection_id"
+	if strings.HasPrefix(collection, "smart:") {
+		collectionKey = "smart_collection_id"
+		collection = strings.TrimPrefix(collection, "smart:")
+	}
+	for key, value := range map[string]string{"platform_ids": platform, collectionKey: collection} {
 		if value != "" {
 			if _, err := ID(value); err != nil {
 				return Page{}, err

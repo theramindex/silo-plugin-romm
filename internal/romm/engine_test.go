@@ -92,7 +92,7 @@ func TestLibraryBrowsingFiltersBeforePagination(t *testing.T) {
 		case "/api/roms":
 			calls++
 			q := r.URL.Query()
-			if strings.Join(q["platform_ids"], ",") != "1,2" || q.Get("order_by") != "created_at" || q.Get("order_dir") != "desc" || q.Get("offset") != "48" || q.Get("collection_id") != "9" || q.Get("group_by_meta_id") != "true" {
+			if strings.Join(q["platform_ids"], ",") != "1,2" || q.Get("order_by") != "created_at" || q.Get("order_dir") != "desc" || q.Get("offset") != "48" || q.Get("collection_id") != "9" || q.Get("favorite") != "true" || q.Get("group_by_meta_id") != "true" {
 				t.Errorf("incorrect browse query: %v", q)
 			}
 			fmt.Fprint(w, `{"items":[{"id":42,"name":"(CUSA01627) - Test_Game (USA).nes.zip","fs_name":"(CUSA01627) - Test_Game (USA).nes.zip","platform_slug":"nes","metadatum":{"first_release_date":649036800000},"sibling_roms":[{"id":43,"fs_name_no_ext":"Test Game (Europe)","is_main_sibling":true},{"id":44,"fs_name_no_ext":"Test Game (World) (Beta)"}]}],"total":97}`)
@@ -109,7 +109,7 @@ func TestLibraryBrowsingFiltersBeforePagination(t *testing.T) {
 	if _, err = e.Link(context.Background(), "owner", "library-test-token", ""); err != nil {
 		t.Fatal(err)
 	}
-	page, err := e.Games(context.Background(), "owner", BrowseQuery{Playable: true, Sort: "newest", Offset: "48", Collection: "9"})
+	page, err := e.Games(context.Background(), "owner", BrowseQuery{Playable: true, Favorite: true, Sort: "newest", Offset: "48", Collection: "9"})
 	if err != nil || page.Total != 97 || len(page.Items) != 1 || page.Items[0].DisplayTitle != "Test Game" {
 		t.Fatalf("browse: %+v %v", page, err)
 	}

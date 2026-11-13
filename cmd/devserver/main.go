@@ -88,6 +88,8 @@ func main() {
 			fmt.Fprint(w, `{"id":7,"username":"Development player"}`)
 		case r.URL.Path == "/api/platforms":
 			fmt.Fprint(w, `[{"id":1,"name":"Nintendo Entertainment System","slug":"nes","rom_count":1}]`)
+		case r.URL.Path == "/api/collections/smart":
+			fmt.Fprint(w, `[]`)
 		case r.URL.Path == "/api/collections":
 			fmt.Fprint(w, `[{"id":1,"name":"Homebrew","rom_count":1}]`)
 		case r.URL.Path == "/api/roms":

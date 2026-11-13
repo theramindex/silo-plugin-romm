@@ -74,20 +74,54 @@ fs.mkdirSync(shots, { recursive: true });
     await page.route(/\/api\/platforms(?:\?|$)/, (route) =>
       route.fulfill({ json: platforms }),
     );
+    let collectionState = "populated";
+    await page.route(/\/api\/collections(?:\?|$)/, (route) =>
+      route.fulfill(
+        collectionState === "failure"
+          ? {
+              status: 503,
+              json: { error: "Collections temporarily unavailable" },
+            }
+          : {
+              json:
+                collectionState === "empty"
+                  ? []
+                  : [
+                      {
+                        id: 1,
+                        key: "1",
+                        kind: "standard",
+                        name: "Handpicked",
+                        rom_count: 3,
+                      },
+                      {
+                        id: 1,
+                        key: "smart:1",
+                        kind: "smart",
+                        name: "Smart picks",
+                        rom_count: 5,
+                      },
+                    ],
+            },
+      ),
+    );
     await page.route(/\/api\/games(?:\?|$)/, (route) =>
       route.fulfill({
         json:
-          new URL(route.request().url()).searchParams.get("recent") === "true"
-            ? {
-                items: [
-                  {
-                    ...games[1],
-                    rom_user: { last_played: "2026-11-12T12:00:00Z" },
-                  },
-                ],
-                total: 1,
-              }
-            : { items: games, total: 97 },
+          new URL(route.request().url()).searchParams.get("favorite") === "true"
+            ? { items: [], total: 0 }
+            : new URL(route.request().url()).searchParams.get("recent") ===
+                "true"
+              ? {
+                  items: [
+                    {
+                      ...games[1],
+                      rom_user: { last_played: "2026-11-12T12:00:00Z" },
+                    },
+                  ],
+                  total: 1,
+                }
+              : { items: games, total: 97 },
       }),
     );
     await page.route(/\/api\/art\?/, (route) =>
@@ -105,22 +139,118 @@ fs.mkdirSync(shots, { recursive: true });
           ?.naturalWidth > 0,
     );
     assert.equal(await page.locator(".platform-tile").count(), 117);
-    await page.getByRole("checkbox", { name: "Show empty platforms" }).check();
-    assert.equal(await page.locator(".platform-tile").count(), 118);
-    await page.reload();
-    await page.locator(".platform-tile").first().waitFor();
-    assert(
+    assert.equal(
+      await page.locator(".overview-controls").count(),
+      0,
+      "overview must not duplicate the platform search",
+    );
+    assert.equal(
       await page
         .getByRole("checkbox", { name: "Show empty platforms" })
-        .isChecked(),
+        .count(),
+      0,
     );
-    assert.equal(await page.locator(".platform-tile").count(), 118);
+    assert.equal(
+      await page.locator("#library-content > .library-heading").count(),
+      0,
+      "Home must not repeat a large page title",
+    );
+    assert.equal(
+      await page.locator("#home-platforms .platform-play-badge").count(),
+      5,
+    );
+    assert.equal(
+      await page
+        .locator('#home-platforms [data-platform="6"] .platform-play-badge')
+        .count(),
+      0,
+      "unsupported systems must not claim Silo play",
+    );
     await page
-      .getByRole("checkbox", { name: "Show empty platforms" })
-      .uncheck();
+      .getByRole("button", { name: "Next platforms", exact: true })
+      .click();
+    await page.waitForFunction(
+      () => document.querySelector("#home-platforms").scrollLeft > 0,
+    );
+    assert(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+      "Home horizontal overflow",
+    );
+    await page.screenshot({ path: shots + "/home-desktop.png" });
+    await page.locator('.library-nav [data-route="platforms"]').click();
+    await page.locator("#platform-groups .platform-tile").first().waitFor();
+    await page.locator("#platform-search").fill("Nintendo Entertainment");
+    assert.equal(await page.locator(".platform-tile").count(), 2);
+    await page.locator("#platform-search").fill("");
     assert.equal(await page.locator(".platform-tile").count(), 117);
-    await page.locator('.activity-grid [data-game="43"]').waitFor();
-    await page.locator('.activity-grid [data-game="43"]').click();
+    await page.locator('.library-nav [data-route="collections"]').click();
+    await page
+      .getByRole("heading", { name: "Collections", exact: true, level: 1 })
+      .waitFor();
+    assert.equal(await page.locator(".collection-row").count(), 2);
+    await page
+      .getByRole("searchbox", { name: "Search Collections", exact: true })
+      .fill("Smart");
+    await page.waitForFunction(
+      () => document.querySelectorAll(".collection-row").length === 1,
+    );
+    await page.locator(".collection-row").click();
+    await page.locator("#grid .game-card").first().waitFor();
+    assert.equal(
+      new URLSearchParams(new URL(page.url()).hash.split("?")[1]).get(
+        "collection",
+      ),
+      "smart:1",
+    );
+    await page
+      .getByRole("heading", { name: "Smart picks", exact: true })
+      .waitFor();
+    const favoriteQuery = page.waitForRequest(
+      (r) =>
+        r.url().includes("/api/games?") &&
+        new URL(r.url()).searchParams.get("favorite") === "true",
+    );
+    await page
+      .locator('.library-nav [data-route="games?favorite=true"]')
+      .click();
+    await favoriteQuery;
+    await page
+      .getByRole("heading", { name: "No favorites yet", exact: true })
+      .waitFor();
+    assert.equal(
+      await page
+        .locator('.library-nav [data-route="games"]')
+        .getAttribute("aria-current"),
+      null,
+    );
+    await page.locator("#search").fill("Mario");
+    await page.waitForFunction(() => location.hash.includes("search=Mario"));
+    assert(
+      new URLSearchParams(page.url().split("#games?")[1]).get("favorite") ===
+        "true",
+    );
+    collectionState = "empty";
+    await page.goto(root + "/romm?theme=midnight-cinema#collections");
+    await page.reload();
+    await page.getByText("No collections yet.", { exact: true }).waitFor();
+    assert(
+      await page
+        .locator('.library-nav [data-route="games?favorite=true"]')
+        .isVisible(),
+    );
+    collectionState = "failure";
+    await page.reload();
+    await page
+      .getByRole("heading", { name: "Could not load collections", exact: true })
+      .waitFor();
+    collectionState = "populated";
+    await page.locator("#retry-collections").click();
+    await page.locator(".collection-row").first().waitFor();
+    await page.locator('.library-nav [data-route="home"]').click();
+    await page.locator('#continue-games [data-game="43"]').waitFor();
+    await page.locator('#continue-games [data-game="43"]').click();
     await page.waitForFunction(
       () => document.querySelector("#rom-version")?.value === "43",
     );
@@ -375,6 +505,21 @@ fs.mkdirSync(shots, { recursive: true });
         "filters-toggle",
       );
     }
+    await page.goto(root + "/romm?theme=light#home");
+    await page.locator("#home-platforms .platform-tile").first().waitFor();
+    await page
+      .getByRole("button", { name: "Next platforms", exact: true })
+      .click();
+    await page.waitForFunction(
+      () => document.querySelector("#home-platforms").scrollLeft > 0,
+    );
+    assert(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+      "mobile Home overflow",
+    );
+    await page.screenshot({ path: shots + "/home-mobile-light.png" });
     await page.goto(root + "/romm?theme=light#platforms");
     await page.locator(".platform-tile").first().waitFor();
     assert(

@@ -301,9 +301,11 @@ fs.mkdirSync(shots, { recursive: true });
     await page.unroute("**/api/content?*");
     await back.click();
     await page.getByRole("button", { name: "Resume", exact: true }).waitFor();
-    await page.goto(root + "/romm?theme=light#platforms");
-    await page.locator('.activity-grid [data-game="42"]').waitFor();
-    await page.locator("#view-recent").click();
+    await page.goto(root + "/romm?theme=light#home");
+    await page.locator('#continue-games [data-game="42"]').waitFor();
+    await page
+      .locator('.home-shelf [data-route="games?recent=true&playable=true"]')
+      .click();
     await page
       .getByRole("heading", {
         name: "Played in Silo on this device",
@@ -315,7 +317,7 @@ fs.mkdirSync(shots, { recursive: true });
     await page.request.post(root + "/romm/api/link", {
       data: { token: "rmm_development-fixture-token" },
     });
-    await page.goto(root + "/romm?theme=light#platforms");
+    await page.goto(root + "/romm?theme=light#home");
     await page.reload();
     await page.locator(".platform-tile").first().waitFor();
     await page.locator("#continue-games .activity-empty").waitFor();

@@ -21,3 +21,8 @@ Pinned/recent platforms are local connection preferences. Continue playing merge
 RomM’s per-user history with successful Silo starts saved locally for the linked
 connection and opens the exact played ROM. Resume appears only
 when compatible progress is known; checking details never reserves a game session.
+
+Home uses horizontal game and platform shelves with View all and previous/next
+controls. The full platform grid stays under Platforms. Supported systems carry
+a play badge. Collections and Favorites remain accessible when empty; standard
+and smart collections and RomM favorites retain their upstream identities.

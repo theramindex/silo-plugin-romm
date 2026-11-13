@@ -441,25 +441,6 @@ button.primary {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
-.overview-search {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border: 1px solid var(--border);
-  background: var(--panel);
-  border-radius: 9px;
-  padding: 0 14px;
-  max-width: 520px;
-  margin-bottom: 38px;
-  color: var(--muted);
-}
-.overview-search input {
-  background: transparent;
-  border: 0;
-  width: 100%;
-  padding: 13px 0;
-  font-size: 0.875rem;
-}
 .platform-section + .platform-section {
   margin-top: 42px;
 }
@@ -503,18 +484,37 @@ button.primary {
   gap: 24px 18px;
 }
 .platform-tile {
+  position: relative;
   display: flex;
   flex-direction: column;
-  align-items: start;
-  gap: 7px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  text-align: left;
+  align-items: center;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+  text-align: center;
   min-width: 0;
 }
 .platform-tile:hover {
-  background: transparent;
+  background: var(--panel-2);
+}
+.platform-play-badge {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--success);
+  color: var(--panel);
+}
+.platform-play-badge .icon {
+  width: 11px;
+  height: 11px;
 }
 .platform-art {
   display: flex;
@@ -522,7 +522,7 @@ button.primary {
   align-items: center;
   width: 100%;
   aspect-ratio: 4 / 3;
-  background: color-mix(in srgb, var(--panel) 84%, var(--text));
+  background: transparent;
   border-radius: 12px;
   overflow: hidden;
   margin-bottom: 5px;
@@ -544,6 +544,7 @@ button.primary {
   overflow-wrap: anywhere;
 }
 .platform-tile-count {
+  margin-top: auto;
   color: var(--muted);
   font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
@@ -665,6 +666,55 @@ button.primary {
 .filter-chip .icon {
   width: 14px;
   height: 14px;
+}
+.home-shelf {
+  margin-bottom: 24px;
+}
+.shelf-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+.shelf-actions .text-button {
+  min-height: 44px;
+  margin-right: 8px;
+}
+.shelf-arrow {
+  min-height: 44px;
+  width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+.shelf-arrow:disabled {
+  opacity: 0.35;
+}
+.home-row {
+  position: relative;
+  min-width: 0;
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  padding: 6px 5px 14px;
+  margin-inline: -5px;
+}
+.home-row > .game-card {
+  flex: 0 0 clamp(132px, 14vw, 176px);
+  scroll-snap-align: start;
+}
+.home-row > .platform-tile {
+  flex: 0 0 160px;
+  scroll-snap-align: start;
+}
+.home-row > .activity-empty {
+  flex: 1 0 100%;
+}
+.home-row:has(> .activity-empty) {
+  padding-block: 0;
 }
 .continue-section {
   margin: 0 0 32px;
@@ -1034,9 +1084,6 @@ button.primary {
     width: 20px;
     height: 20px;
   }
-  .overview-search {
-    margin-bottom: 24px;
-  }
   .platform-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px 14px;
@@ -1046,6 +1093,20 @@ button.primary {
   }
   .section-heading h2 {
     font-size: 1rem;
+  }
+  .shelf-actions {
+    gap: 4px;
+  }
+  .shelf-actions .text-button {
+    margin-right: 0;
+    font-size: 0.75rem;
+  }
+  .home-row > .platform-tile {
+    flex-basis: 144px;
+  }
+  .home-shelf .section-heading {
+    gap: 8px;
+    margin-bottom: 8px;
   }
   .game-grid,
   .activity-grid {
@@ -1479,32 +1540,34 @@ dialog::backdrop {
   border: 0;
 }
 
-/* Browsing refinements: keep source covers intact and ROM choices explicit. */
-.overview-controls {
+/* Collection rows share the library's existing typography and controls. */
+.collection-section + .collection-section {
+  margin-top: 28px;
+}
+.collection-section h2 {
+  font-size: 1rem;
+  margin: 0 0 12px;
+}
+.collection-list {
+  display: grid;
+  gap: 8px;
+}
+.collection-row {
   display: flex;
   align-items: center;
-  gap: 24px;
-  flex-wrap: wrap;
-  margin-bottom: 24px;
+  gap: 12px;
+  text-align: left;
+  min-height: 52px;
 }
-.overview-controls .overview-search {
+.collection-row > span {
   flex: 1;
-  margin-bottom: 0;
-  min-width: min(100%, 260px);
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
-.empty-platforms-toggle {
-  display: flex;
-  align-items: center;
-  gap: 9px;
+.collection-row small {
+  color: var(--muted);
   font-size: 0.8125rem;
-  min-height: 44px;
-  cursor: pointer;
-}
-.empty-platforms-toggle input {
-  accent-color: var(--accent);
-  margin: 0;
-  width: 16px;
-  height: 16px;
+  white-space: nowrap;
 }
 .version-count {
   flex: 0 0 auto;
@@ -1537,13 +1600,6 @@ dialog::backdrop {
   min-height: 44px;
 }
 @media (max-width: 720px) {
-  .overview-controls {
-    gap: 10px;
-    margin-bottom: 24px;
-  }
-  .overview-controls .overview-search {
-    flex-basis: 100%;
-  }
   .back-library,
   .breadcrumb,
   .section-heading .text-button {
