@@ -1606,3 +1606,32 @@ dialog::backdrop {
     min-height: 44px;
   }
 }
+
+.approval-options {
+  margin: 20px 0;
+}
+.approval-options summary {
+  cursor: pointer;
+  color: var(--muted);
+  padding: 8px 0;
+}
+#romm-sign-in-progress:empty {
+  display: none;
+}
+#romm-sign-in-progress > .approval-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+#romm-sign-in-cancel {
+  display: block;
+  margin-top: 16px;
+}
+
+.game-card {
+  position: relative;
+}
+.game-card > .platform-play-badge {
+  top: 8px;
+  right: 8px;
+}

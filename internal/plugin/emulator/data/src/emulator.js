@@ -62,6 +62,8 @@ class EmulatorJS {
             }
             return core;
         }
+        // An explicit core is pinned to the host save namespace.
+        if (!cores[core]) return core;
         const gen = this.getCore(true);
         if (cores[gen] && cores[gen].includes(this.preGetSetting("retroarch_core"))) {
             return this.preGetSetting("retroarch_core");
@@ -4783,7 +4785,7 @@ class EmulatorJS {
         }
         const cores = this.getCores();
         const core = cores[this.getCore(true)];
-        if (core && core.length > 1) {
+        if (core && core.length > 1 && cores[this.config.system]) {
             addToMenu(this.localization("Core" + " (" + this.localization("Requires restart") + ")"), "retroarch_core", core, this.getCore(), home);
         }
         if (typeof window.SharedArrayBuffer === "function" && !this.requiresThreads(this.getCore())) {

@@ -8,6 +8,7 @@ import (
 	pluginv1 "github.com/Silo-Server/silo-plugin-sdk/pkg/pluginproto/silo/plugin/v1"
 	"github.com/theramindex/silo-plugin-romm/internal/romm"
 	"html"
+	"io"
 	"io/fs"
 	"mime"
 	"net"
@@ -23,6 +24,7 @@ var files embed.FS
 
 type relayGrant struct {
 	Owner, Session, Kind string
+	Asset                string
 	Game                 int64
 	Expires              time.Time
 }
@@ -102,7 +104,20 @@ func (s *Server) Handle(ctx context.Context, r *pluginv1.HandleHTTPRequest) (*pl
 		method = "GET"
 	}
 	if strings.HasPrefix(p, "/romm/assets/") && method == "GET" {
-		return asset(strings.TrimPrefix(p, "/romm/assets/")), nil
+		name := strings.TrimPrefix(p, "/romm/assets/")
+		file := assetFile(name)
+		if info, err := fs.Stat(files, file); err == nil && info.Size() > 1<<20 {
+			own, err := owner(r)
+			if err != nil {
+				return response(401, map[string]string{"error": err.Error()}), nil
+			}
+			target, err := s.grant(relayGrant{Owner: own, Kind: "asset", Asset: file, Expires: time.Now().Add(time.Minute)})
+			if err != nil {
+				return problem(err), nil
+			}
+			return &pluginv1.HandleHTTPResponse{StatusCode: 200, Headers: map[string]string{"X-Silo-Relay-URL": target}}, nil
+		}
+		return asset(name), nil
 	}
 	own, err := owner(r)
 	if err != nil {
@@ -124,7 +139,12 @@ func (s *Server) Handle(ctx context.Context, r *pluginv1.HandleHTTPRequest) (*pl
 		} // Pinned Emscripten cores compile JS wrappers dynamically.
 		policy := "default-src 'self'; script-src " + scriptPolicy + "; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' blob:; object-src 'none'; base-uri 'self'"
 		b = []byte(strings.NewReplacer("__CSP__", html.EscapeString(policy), "__BASE__", base, "__THEME__", html.EscapeString(theme)).Replace(string(b)))
-		return &pluginv1.HandleHTTPResponse{StatusCode: 200, Headers: map[string]string{"Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "Content-Security-Policy": policy + "; frame-ancestors 'self'"}, Body: b}, nil
+		headers := map[string]string{"Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "Content-Security-Policy": policy + "; frame-ancestors 'self'"}
+		if p == "/romm/play" {
+			headers["Cross-Origin-Opener-Policy"] = "same-origin"
+			headers["Cross-Origin-Embedder-Policy"] = "require-corp"
+		}
+		return &pluginv1.HandleHTTPResponse{StatusCode: 200, Headers: headers, Body: b}, nil
 	}
 	var out any
 	switch {
@@ -226,14 +246,17 @@ func (s *Server) Handle(ctx context.Context, r *pluginv1.HandleHTTPRequest) (*pl
 	}
 	return response(200, out), nil
 }
-func asset(name string) *pluginv1.HandleHTTPResponse {
-	if path.Clean(name) != name || strings.HasPrefix(name, "/") || strings.Contains(name, "\\") {
-		return response(404, nil)
+func assetFile(name string) string {
+	if path.Clean(name) != name || strings.HasPrefix(name, "/") || strings.Contains(name, "\\") || strings.HasPrefix(name, "..") {
+		return ""
 	}
-	file := "ui/" + name
 	if strings.HasPrefix(name, "emulator/") {
-		file = name
+		return name
 	}
+	return "ui/" + name
+}
+func asset(name string) *pluginv1.HandleHTTPResponse {
+	file := assetFile(name)
 	b, err := files.ReadFile(file)
 	if err != nil {
 		return response(404, nil)
@@ -280,6 +303,22 @@ func (s *Server) serveRelay(w http.ResponseWriter, r *http.Request) {
 	s.mu.Unlock()
 	if !ok || time.Now().After(g.Expires) || r.Method != "GET" {
 		http.NotFound(w, r)
+		return
+	}
+	if g.Kind == "asset" {
+		f, err := files.Open(g.Asset)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+		defer f.Close()
+		typ := mime.TypeByExtension(path.Ext(g.Asset))
+		if typ == "" || strings.HasSuffix(g.Asset, ".data") {
+			typ = "application/octet-stream"
+		}
+		w.Header().Set("Content-Type", typ)
+		w.Header().Set("Cache-Control", "public, max-age=0, must-revalidate")
+		_, _ = io.Copy(w, f)
 		return
 	}
 	var up *http.Response

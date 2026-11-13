@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"encoding/xml"
+	"io"
+	"net/http"
 	"strings"
 	"testing"
 
@@ -52,5 +55,51 @@ func TestPackagedPlatformArtworkDelivery(t *testing.T) {
 				paths = append(paths, "/romm/assets/platforms/"+name+".svg")
 			}
 		}
+	}
+}
+
+// A real core exceeds gRPC's default message limit. Delivery must cross Silo's
+// authenticated route gate and the loopback relay, without truncating its pack.
+func TestPackagedLargeCoreDelivery(t *testing.T) {
+	const route = "/romm/assets/emulator/data/cores/fbneo-wasm.data"
+	var manifest struct {
+		Routes []struct{ Method, Path, Access string } `json:"http_routes"`
+	}
+	if err := json.Unmarshal(manifestJSON, &manifest); err != nil {
+		t.Fatal(err)
+	}
+	allowed := false
+	for _, r := range manifest.Routes {
+		if r.Path == route && r.Method == "GET" && r.Access == "authenticated" {
+			allowed = true
+		}
+	}
+	if !allowed {
+		t.Fatal("core is absent from authenticated manifest routes")
+	}
+	server := &plugin.Server{}
+	defer server.Close()
+	request := &pluginv1.HandleHTTPRequest{Method: "GET", Path: route, Headers: map[string]string{"X-Silo-User-Id": "7", "X-Silo-Profile-Id": "player"}}
+	response, err := server.Handle(context.Background(), request)
+	if err != nil || response.GetStatusCode() != 200 {
+		t.Fatalf("core route failed: %v %v", response, err)
+	}
+	target := response.GetHeaders()["X-Silo-Relay-URL"]
+	if target == "" {
+		t.Fatal("large core was sent through gRPC instead of relay")
+	}
+	up, err := http.Get(target)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer up.Body.Close()
+	data, err := io.ReadAll(up.Body)
+	if err != nil || up.StatusCode != 200 || len(data) <= 4<<20 || !bytes.HasPrefix(data, []byte{'7', 'z', 0xbc, 0xaf, 0x27, 0x1c}) {
+		t.Fatalf("core pack truncated or invalid: status=%d bytes=%d err=%v", up.StatusCode, len(data), err)
+	}
+	request.Headers = nil
+	denied, _ := server.Handle(context.Background(), request)
+	if denied.GetStatusCode() != 401 {
+		t.Fatal("large core relay granted without profile identity")
 	}
 }

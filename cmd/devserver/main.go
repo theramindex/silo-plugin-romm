@@ -4,6 +4,8 @@
 package main
 
 import (
+	"archive/zip"
+	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/binary"
@@ -98,6 +100,16 @@ func main() {
 			fmt.Fprint(w, `{"id":42,"name":"Silo Controller Test","summary":"An original NES diagnostic cartridge. A blue screen confirms the bundled core booted successfully. Used only by the local development harness.","platform_id":1,"platform_slug":"nes","platform_display_name":"NES","fs_name":"silo-test.nes","path_cover_small":"/assets/romm/test.png?ts=2026-11-12 03:00:22","metadatum":{"first_release_date":649036800000},"sibling_roms":[{"id":43,"name":"Silo Controller Test","fs_name_no_ext":"silo-test (Europe)","is_main_sibling":true}]}`)
 		case r.URL.Path == "/api/roms/43":
 			fmt.Fprint(w, `{"id":43,"name":"Silo Controller Test","summary":"Alternate ROM fixture. No game is launched by the version-selection test.","platform_id":1,"platform_slug":"nes","platform_display_name":"NES","fs_name":"silo-test (Europe).nes","rom_user":{"is_main_sibling":true},"metadatum":{"first_release_date":649036800},"sibling_roms":[{"id":42,"name":"Silo Controller Test","fs_name_no_ext":"silo-test"}]}`)
+		case r.URL.Path == "/api/roms/44":
+			fmt.Fprint(w, `{"id":44,"name":"Silo DOS diagnostic","platform_id":2,"platform_slug":"dos","platform_display_name":"DOS","fs_name":"silo-dos.zip"}`)
+		case strings.HasPrefix(r.URL.Path, "/api/roms/44/content/"):
+			var pack bytes.Buffer
+			archive := zip.NewWriter(&pack)
+			entry, _ := archive.Create("HELLO.COM")
+			// Original DOS program: print a message, then wait for a key.
+			_, _ = entry.Write(append([]byte{0xba, 0x0e, 0x01, 0xb4, 0x09, 0xcd, 0x21, 0xb4, 0x00, 0xcd, 0x16, 0xeb, 0xfe, 0x90}, []byte("SILO DOS TEST OK$")...))
+			_ = archive.Close()
+			_, _ = w.Write(pack.Bytes())
 		case strings.HasPrefix(r.URL.Path, "/api/roms/42/content/"):
 			w.Header().Set("Content-Type", "application/octet-stream")
 			_, _ = w.Write(testROM())

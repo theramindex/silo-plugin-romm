@@ -39,9 +39,7 @@ fs.mkdirSync(shots, { recursive: true });
       await page.setViewportSize({ width: 1440, height: 1000 });
       async function startApproval() {
         const opened = page.waitForEvent("popup");
-        await page
-          .getByRole("button", { name: "Sign in to RomM", exact: true })
-          .click();
+        await page.locator("#romm-sign-in").click();
         const popup = await opened;
         await popup
           .getByRole("button", { name: "Approve Silo Games" })
@@ -61,7 +59,7 @@ fs.mkdirSync(shots, { recursive: true });
       await page
         .getByRole("button", { name: "Cancel sign-in", exact: true })
         .click();
-      await page.getByText("Sign-in cancelled. You can try again.").waitFor();
+      await page.getByText("Sign-in cancelled.").waitFor();
       await cancelled.close();
       const declined = await startApproval();
       await declined.getByRole("button", { name: "Decline access" }).click();

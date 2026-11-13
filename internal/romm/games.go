@@ -1,6 +1,7 @@
 package romm
 
 import (
+	"archive/zip"
 	"context"
 	"errors"
 	"fmt"
@@ -18,14 +19,15 @@ import (
 const EmulatorVersion = "emulatorjs-4.2.3"
 
 type Platform struct {
-	ID           int64  `json:"id"`
-	Name         string `json:"name"`
-	Slug         string `json:"slug"`
-	Count        int    `json:"rom_count"`
-	DisplayName  string `json:"display_name,omitempty"`
-	Abbreviation string `json:"abbreviation,omitempty"`
-	Family       string `json:"family_name,omitempty"`
-	Core         string `json:"core,omitempty"`
+	ID           int64   `json:"id"`
+	Name         string  `json:"name"`
+	Slug         string  `json:"slug"`
+	Count        int     `json:"rom_count"`
+	DisplayName  string  `json:"display_name,omitempty"`
+	Abbreviation string  `json:"abbreviation,omitempty"`
+	Family       string  `json:"family_name,omitempty"`
+	Core         string  `json:"core,omitempty"`
+	Emulation    *System `json:"emulation,omitempty"`
 }
 type Collection struct {
 	Key   string `json:"key"`
@@ -49,6 +51,7 @@ type Game struct {
 	Size           int64        `json:"fs_size_bytes"`
 	OnDisk         *bool        `json:"has_file_on_disk,omitempty"`
 	Core           string       `json:"core"`
+	Emulation      *System      `json:"emulation,omitempty"`
 	DisplayTitle   string       `json:"display_title"`
 	Metadata       GameMetadata `json:"metadatum"`
 	Siblings       []SiblingROM `json:"sibling_roms"`
@@ -76,6 +79,7 @@ type GameMetadata struct {
 
 func normalizeGame(g *Game) {
 	g.Core = Core(g.PlatformSlug)
+	g.Emulation = LookupSystem(g.PlatformSlug)
 	if g.Filename == "" {
 		g.Filename = g.LegacyFilename
 	}
@@ -152,19 +156,6 @@ type Page struct {
 	Offset int    `json:"offset"`
 }
 
-func Core(slug string) string {
-	switch strings.ToLower(slug) {
-	case "nes", "famicom":
-		return "fceumm"
-	case "snes", "super-famicom":
-		return "snes9x"
-	case "gb", "gbc", "game-boy", "game-boy-color":
-		return "gambatte"
-	case "gba", "game-boy-advance":
-		return "mgba"
-	}
-	return ""
-}
 func (e *Engine) Platforms(ctx context.Context, owner string) ([]Platform, error) {
 	var out []Platform
 	err := e.JSON(ctx, owner, "/api/platforms", &out)
@@ -173,6 +164,7 @@ func (e *Engine) Platforms(ctx context.Context, owner string) ([]Platform, error
 			out[i].Name = out[i].DisplayName
 		}
 		out[i].Core = Core(out[i].Slug)
+		out[i].Emulation = LookupSystem(out[i].Slug)
 	}
 	sort.SliceStable(out, func(i, j int) bool { return strings.ToLower(out[i].Name) < strings.ToLower(out[j].Name) })
 	return out, err
@@ -304,18 +296,19 @@ type Asset struct {
 	Filename string `json:"file_name"`
 }
 type Session struct {
-	ID         string    `json:"id"`
-	Owner      string    `json:"-"`
-	Generation string    `json:"generation"`
-	Server     string    `json:"-"`
-	Game       Game      `json:"game"`
-	Emulator   string    `json:"emulator"`
-	Namespace  string    `json:"namespace"`
-	SaveID     int64     `json:"saveId,omitempty"`
-	StateID    int64     `json:"stateId,omitempty"`
-	BIOSID     int64     `json:"biosId,omitempty"`
-	BIOSName   string    `json:"-"`
-	Expires    time.Time `json:"-"`
+	ID         string     `json:"id"`
+	Owner      string     `json:"-"`
+	Generation string     `json:"generation"`
+	Server     string     `json:"-"`
+	Game       Game       `json:"game"`
+	Emulator   string     `json:"emulator"`
+	Namespace  string     `json:"namespace"`
+	SaveID     int64      `json:"saveId,omitempty"`
+	StateID    int64      `json:"stateId,omitempty"`
+	BIOSID     int64      `json:"biosId,omitempty"`
+	BIOSName   string     `json:"biosName,omitempty"`
+	Firmware   []Firmware `json:"-"`
+	Expires    time.Time  `json:"-"`
 }
 
 func (e *Engine) assets(ctx context.Context, owner, kind string, rom int64) ([]Asset, error) {
@@ -336,13 +329,13 @@ func (e *Engine) Play(ctx context.Context, owner string, id int64) (Session, err
 		return Session{}, errors.New("RomM cannot find this ROM file. Check its library storage or choose another version.")
 	}
 	if g.Core == "" {
-		return Session{}, errors.New("Browser play currently supports NES, SNES, Game Boy, Game Boy Color and Game Boy Advance")
+		return Session{}, errors.New("This platform is not supported by the bundled EmulatorJS version")
 	}
-	if g.Size > 64<<20 {
-		return Session{}, errors.New("Browser play supports ROM files up to 64 MiB")
+	if g.Size > 2<<30 {
+		return Session{}, errors.New("This ROM exceeds the browser’s 2 GiB download limit")
 	}
 	if g.Filename == "" || strings.ContainsAny(g.Filename, "/\\") {
-		return Session{}, errors.New("This game needs a single ROM file for browser play")
+		return Session{}, errors.New("RomM did not provide a valid game filename")
 	}
 	s := Session{ID: randomID(), Owner: owner, Generation: link.Generation, Server: link.Server, Game: g, Emulator: g.Core + "-" + EmulatorVersion, Namespace: link.Generation + "-" + strconv.FormatInt(id, 10), Expires: time.Now().Add(6 * time.Hour)}
 	// A failed save lookup must stop launch: starting a fresh game could overwrite
@@ -352,22 +345,26 @@ func (e *Engine) Play(ctx context.Context, owner string, id int64) (Session, err
 		return Session{}, err
 	}
 	s.SaveID, s.StateID = progress.saveID, progress.stateID
-	// These initial cores work without BIOS, but use a matching installed firmware
-	// when RomM has one. No BIOS or ROM data is bundled with the plugin.
-	var firmware []struct {
-		ID       int64  `json:"id"`
-		Platform int64  `json:"platform_id"`
-		Name     string `json:"file_name"`
-	}
+	var firmware []Firmware
 	if err = e.JSON(ctx, owner, "/api/firmware?platform_id="+strconv.FormatInt(g.PlatformID, 10), &firmware); err != nil {
 		return Session{}, err
 	}
-	names := map[string]string{"gba": "gba_bios.bin", "gb": "gb_bios.bin", "gbc": "gbc_bios.bin"}
 	for _, f := range firmware {
-		if f.Platform == g.PlatformID && names[g.PlatformSlug] != "" && strings.EqualFold(f.Name, names[g.PlatformSlug]) {
-			s.BIOSID = f.ID
-			s.BIOSName = f.Name
-			break
+		if f.Platform == g.PlatformID && f.ID > 0 && safeFirmwareName(f.Name) {
+			s.Firmware = append(s.Firmware, f)
+		}
+	}
+	if len(s.Firmware) > 64 {
+		return Session{}, errors.New("Too many firmware files for this platform; use a BIOS bundle in RomM")
+	}
+	if len(s.Firmware) == 0 && g.Emulation.RequiresBIOS {
+		return Session{}, fmt.Errorf("Add this platform’s BIOS in RomM before playing. %s", g.Emulation.BIOSHint)
+	}
+	if len(s.Firmware) > 0 {
+		s.BIOSID = s.Firmware[0].ID
+		s.BIOSName = s.Firmware[0].Name
+		if len(s.Firmware) > 1 {
+			s.BIOSName = "firmware.zip"
 		}
 	}
 	e.mu.Lock()
@@ -417,7 +414,11 @@ func (e *Engine) stream(ctx context.Context, owner, target string) (*http.Respon
 		return nil, ErrUpstream
 	}
 	r.Header.Set("Authorization", "Bearer "+t)
-	response, err := e.client.Do(r)
+	client := *e.client
+	// Streaming bodies may be large discs; request cancellation still bounds the
+	// stream, while the host relay enforces its response-header deadline.
+	client.Timeout = 0
+	response, err := client.Do(r)
 	if err != nil {
 		return nil, ErrUpstream
 	}
@@ -437,10 +438,13 @@ func (e *Engine) Content(ctx context.Context, owner, id, kind string) (*http.Res
 	case "rom":
 		target = fmt.Sprintf("/api/roms/%d/content/%s?purpose=play", s.Game.ID, url.PathEscape(s.Game.Filename))
 	case "bios":
-		if s.BIOSID <= 0 {
+		if len(s.Firmware) == 0 {
 			return nil, ErrUpstream
 		}
-		target = fmt.Sprintf("/api/firmware/%d/content/%s", s.BIOSID, url.PathEscape(s.BIOSName))
+		if len(s.Firmware) > 1 {
+			return e.firmwareBundle(ctx, owner, s.Firmware)
+		}
+		target = fmt.Sprintf("/api/firmware/%d/content/%s", s.Firmware[0].ID, url.PathEscape(s.Firmware[0].Name))
 	case "saves", "states":
 		a := s.SaveID
 		if kind == "states" {
@@ -495,4 +499,54 @@ func CopyContent(w http.ResponseWriter, r *http.Response, kind string) {
 	w.Header().Set("Content-Type", typ)
 	w.Header().Set("Cache-Control", "no-store")
 	_, _ = io.Copy(w, r.Body)
+}
+
+// Firmware is selected by the server from the linked account's platform, never
+// from browser-supplied file paths. Filenames survive delivery to EmulatorJS.
+type Firmware struct {
+	ID       int64  `json:"id"`
+	Platform int64  `json:"platform_id"`
+	Name     string `json:"file_name"`
+}
+
+func safeFirmwareName(name string) bool {
+	return name != "" && name != "." && name != ".." && len(name) <= 255 && !strings.ContainsAny(name, "/\\\x00\r\n")
+}
+func (e *Engine) firmwareBundle(ctx context.Context, owner string, firmware []Firmware) (*http.Response, error) {
+	reader, writer := io.Pipe()
+	go func() {
+		archive := zip.NewWriter(writer)
+		seen := map[string]bool{}
+		var err error
+		for _, f := range firmware {
+			if seen[f.Name] {
+				continue
+			}
+			seen[f.Name] = true
+			var up *http.Response
+			up, err = e.stream(ctx, owner, fmt.Sprintf("/api/firmware/%d/content/%s", f.ID, url.PathEscape(f.Name)))
+			if err != nil {
+				break
+			}
+			var entry io.Writer
+			entry, err = archive.Create(f.Name)
+			if err == nil {
+				var n int64
+				n, err = io.Copy(entry, io.LimitReader(up.Body, 128<<20+1))
+				if n > 128<<20 {
+					err = errors.New("Firmware file is too large")
+				}
+			}
+			up.Body.Close()
+			if err != nil {
+				break
+			}
+		}
+		closeErr := archive.Close()
+		if err == nil {
+			err = closeErr
+		}
+		writer.CloseWithError(err)
+	}()
+	return &http.Response{StatusCode: 200, Header: http.Header{}, Body: reader}, nil
 }

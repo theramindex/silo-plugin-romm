@@ -1,0 +1,217 @@
+[
+  {
+    "repo": "https://github.com/EmulatorJS/vice-libretro",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/vice-libretro/master/COPYING",
+    "file": "vice-libretro.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/libretro-fceumm",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/libretro-fceumm/master/Copying",
+    "file": "libretro-fceumm.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/nestopia",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/nestopia/master/COPYING",
+    "file": "nestopia.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/snes9x",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/snes9x/master/LICENSE",
+    "file": "snes9x.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/gambatte-libretro",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/gambatte-libretro/master/COPYING",
+    "file": "gambatte-libretro.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/mgba",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/mgba/master/LICENSE",
+    "file": "mgba.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/beetle-vb-libretro",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/beetle-vb-libretro/master/COPYING",
+    "file": "beetle-vb-libretro.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/mupen64plus-libretro-nx",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/mupen64plus-libretro-nx/master/LICENSE",
+    "file": "mupen64plus-libretro-nx.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/melonDS",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/melonDS/master/LICENSE",
+    "file": "melonDS.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/desmume2015",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/desmume2015/b4ae0af744cf8f7895f3586ece449f876f3142e6/desmume/COPYING",
+    "file": "desmume2015.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/desmume",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/desmume/master/license.txt",
+    "file": "desmume.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/a5200",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/a5200/master/License.txt",
+    "file": "a5200.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/fbalpha2012_cps1",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/fbalpha2012_cps1/master/src/license.txt",
+    "file": "fbalpha2012_cps1.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/fbalpha2012_cps2",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/fbalpha2012_cps2/master/src/license.txt",
+    "file": "fbalpha2012_cps2.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/prosystem-libretro",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/prosystem-libretro/master/License.txt",
+    "file": "prosystem-libretro.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/stella2014-libretro",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/stella2014-libretro/1f578c36382bb5a86a0fe245973fa557f369738b/stella/license.txt",
+    "file": "stella2014-libretro.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/opera-libretro",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/opera-libretro/e96e6292659b266bb6dbca69835aad069e83906e/deps/lzma-19.00/LICENSE",
+    "file": "opera-libretro.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/Genesis-Plus-GX",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/Genesis-Plus-GX/master/LICENSE.txt",
+    "file": "Genesis-Plus-GX.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/yabause",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/yabause/7b612a6b63dc61f8a8d197e548c95846abace03c/mini18n/COPYING",
+    "file": "yabause.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/libretro-handy",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/libretro-handy/3559612a695cf54e0ba39f39327b643b0670b322/lynx/license.txt",
+    "file": "libretro-handy.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/virtualjaguar-libretro",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/virtualjaguar-libretro/master/docs/GPLv3",
+    "file": "virtualjaguar-libretro.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/pcsx_rearmed",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/pcsx_rearmed/master/COPYING",
+    "file": "pcsx_rearmed.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/picodrive",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/picodrive/master/COPYING",
+    "file": "picodrive.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/FBNeo",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/FBNeo/master/src/license.txt",
+    "file": "FBNeo.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/beetle-psx-libretro",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/beetle-psx-libretro/master/COPYING",
+    "file": "beetle-psx-libretro.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/beetle-pce-libretro",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/beetle-pce-libretro/master/COPYING",
+    "file": "beetle-pce-libretro.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/beetle-pcfx-libretro",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/beetle-pcfx-libretro/master/COPYING",
+    "file": "beetle-pcfx-libretro.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/beetle-ngp-libretro",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/beetle-ngp-libretro/master/COPYING",
+    "file": "beetle-ngp-libretro.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/beetle-wswan-libretro",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/beetle-wswan-libretro/master/COPYING",
+    "file": "beetle-wswan-libretro.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/Gearcoleco",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/Gearcoleco/master/LICENSE",
+    "file": "Gearcoleco.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/parallel-n64",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/parallel-n64/917b47be676d1b34e2a8dd6409188a52e2fb7265/mupen64plus-core/LICENSES",
+    "file": "parallel-n64.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/mame2003-libretro",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/mame2003-libretro/master/LICENSE.md",
+    "file": "mame2003-libretro.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/mame2003-plus-libretro",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/mame2003-plus-libretro/master/LICENSE.md",
+    "file": "mame2003-plus-libretro.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/libretro-uae",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/libretro-uae/master/COPYING",
+    "file": "libretro-uae.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/smsplus-gx",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/smsplus-gx/c642bbd0680b5959180a420036108893d0aec961/docs/license",
+    "file": "smsplus-gx.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/81-libretro",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/81-libretro/master/LICENSE",
+    "file": "81-libretro.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/fuse-libretro",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/fuse-libretro/master/LICENSE",
+    "file": "fuse-libretro.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/libretro-cap32",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/libretro-cap32/c67cdf9ccd145c94ef9ca08d756ad4d1f040806a/cap32/COPYING.txt",
+    "file": "libretro-cap32.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/libretro-crocods",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/libretro-crocods/master/LICENSE",
+    "file": "libretro-crocods.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/libretro-prboom",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/libretro-prboom/master/COPYING",
+    "file": "libretro-prboom.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/ppsspp",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/ppsspp/master/LICENSE.TXT",
+    "file": "ppsspp.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/same_cdi",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/same_cdi/master/COPYING",
+    "file": "same_cdi.txt"
+  },
+  {
+    "repo": "https://github.com/EmulatorJS/dosbox-pure",
+    "license_url": "https://raw.githubusercontent.com/EmulatorJS/dosbox-pure/master/LICENSE",
+    "file": "dosbox-pure.txt"
+  }
+]

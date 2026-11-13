@@ -35,16 +35,29 @@ const platforms = [
     core: "mgba",
     rom_count: 1116,
   },
-  { id: 6, name: "Nintendo 64", slug: "n64", rom_count: 338 },
+  {
+    id: 6,
+    name: "Nintendo 64",
+    slug: "n64",
+    core: "mupen64plus_next",
+    rom_count: 338,
+  },
   { id: 7, name: "Nintendo GameCube", slug: "ngc", rom_count: 650 },
-  { id: 8, name: "PlayStation", slug: "ps", rom_count: 1567 },
+  {
+    id: 8,
+    name: "PlayStation",
+    slug: "ps",
+    core: "pcsx_rearmed",
+    rom_count: 1567,
+  },
   { id: 9, name: "PlayStation 2", slug: "ps2", rom_count: 2090 },
   { id: 10, name: "PlayStation 4", slug: "ps4", rom_count: 457 },
   { id: 11, name: "Sega Mega Drive", slug: "genesis", rom_count: 884 },
   ...Array.from({ length: 106 }, (_, i) => ({
     id: 100 + i,
-    name: "Test archive platform " + (i + 1),
-    slug: "fixture-" + i,
+    name: i === 0 ? "3DO" : "Test archive platform " + (i + 1),
+    slug: i === 0 ? "3do" : "fixture-" + i,
+    core: i === 0 ? "opera" : "",
     rom_count: 40 + i,
   })),
   { id: 999, name: "Empty archive", slug: "fixture-empty", rom_count: 0 },
@@ -156,12 +169,14 @@ fs.mkdirSync(shots, { recursive: true });
       "Home must not repeat a large page title",
     );
     assert.equal(
-      await page.locator("#home-platforms .platform-play-badge").count(),
-      5,
+      await page
+        .locator('#home-platforms [data-platform="100"] .platform-play-badge')
+        .count(),
+      1,
     );
     assert.equal(
       await page
-        .locator('#home-platforms [data-platform="6"] .platform-play-badge')
+        .locator('#home-platforms [data-platform="10"] .platform-play-badge')
         .count(),
       0,
       "unsupported systems must not claim Silo play",

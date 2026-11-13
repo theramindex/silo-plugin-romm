@@ -1357,6 +1357,1614 @@
       "path": "/romm/assets/platforms/xboxone.svg",
       "access": "authenticated",
       "navigable": false
+    },
+    {
+      "id": "romm-core-pack-1",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/81-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-2",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/81-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-3",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/81-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-4",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/81-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-5",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/a5200-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-6",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/a5200-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-7",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/a5200-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-8",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/a5200-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-9",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/beetle_vb-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-10",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/beetle_vb-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-11",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/beetle_vb-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-12",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/beetle_vb-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-13",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/cap32-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-14",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/cap32-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-15",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/cap32-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-16",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/cap32-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-17",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/crocods-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-18",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/crocods-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-19",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/crocods-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-20",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/crocods-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-21",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/desmume-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-22",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/desmume-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-23",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/desmume-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-24",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/desmume-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-25",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/desmume2015-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-26",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/desmume2015-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-27",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/desmume2015-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-28",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/desmume2015-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-29",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/dosbox_pure-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-30",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/dosbox_pure-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-31",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/fbalpha2012_cps1-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-32",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/fbalpha2012_cps1-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-33",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/fbalpha2012_cps1-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-34",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/fbalpha2012_cps1-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-35",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/fbalpha2012_cps2-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-36",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/fbalpha2012_cps2-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-37",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/fbalpha2012_cps2-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-38",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/fbalpha2012_cps2-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-39",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/fbneo-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-40",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/fbneo-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-41",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/fbneo-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-42",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/fbneo-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-43",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/fceumm-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-44",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/fceumm-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-45",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/fuse-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-46",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/fuse-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-47",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/fuse-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-48",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/fuse-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-49",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/gambatte-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-50",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/gambatte-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-51",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/gearcoleco-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-52",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/gearcoleco-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-53",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/gearcoleco-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-54",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/gearcoleco-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-55",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/genesis_plus_gx-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-56",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/genesis_plus_gx-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-57",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/genesis_plus_gx-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-58",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/genesis_plus_gx-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-59",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/handy-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-60",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/handy-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-61",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/handy-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-62",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/handy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-63",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mame2003-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-64",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mame2003-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-65",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mame2003-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-66",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mame2003-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-67",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mame2003_plus-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-68",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mame2003_plus-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-69",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mame2003_plus-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-70",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mame2003_plus-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-71",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mednafen_ngp-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-72",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mednafen_ngp-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-73",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mednafen_ngp-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-74",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mednafen_ngp-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-75",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mednafen_pce-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-76",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mednafen_pce-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-77",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mednafen_pce-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-78",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mednafen_pce-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-79",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mednafen_pcfx-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-80",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mednafen_pcfx-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-81",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mednafen_pcfx-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-82",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mednafen_pcfx-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-83",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mednafen_psx_hw-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-84",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mednafen_psx_hw-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-85",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mednafen_psx_hw-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-86",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mednafen_psx_hw-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-87",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mednafen_wswan-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-88",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mednafen_wswan-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-89",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mednafen_wswan-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-90",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mednafen_wswan-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-91",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/melonds-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-92",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/melonds-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-93",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/melonds-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-94",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/melonds-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-95",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mgba-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-96",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mgba-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-97",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mupen64plus_next-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-98",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mupen64plus_next-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-99",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mupen64plus_next-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-100",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/mupen64plus_next-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-101",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/nestopia-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-102",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/nestopia-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-103",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/nestopia-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-104",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/nestopia-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-105",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/opera-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-106",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/opera-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-107",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/opera-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-108",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/opera-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-109",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/parallel_n64-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-110",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/parallel_n64-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-111",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/parallel_n64-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-112",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/parallel_n64-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-113",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/pcsx_rearmed-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-114",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/pcsx_rearmed-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-115",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/pcsx_rearmed-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-116",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/pcsx_rearmed-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-117",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/picodrive-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-118",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/picodrive-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-119",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/picodrive-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-120",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/picodrive-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-121",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/ppsspp-assets.zip",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-122",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/ppsspp-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-123",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/prboom-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-124",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/prboom-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-125",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/prboom-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-126",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/prboom-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-127",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/prosystem-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-128",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/prosystem-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-129",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/prosystem-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-130",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/prosystem-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-131",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/puae-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-132",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/puae-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-133",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/puae-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-134",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/puae-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-135",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/81.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-136",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/a5200.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-137",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/beetle_vb.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-138",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/cap32.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-139",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/crocods.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-140",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/desmume.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-141",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/desmume2015.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-142",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/dosbox_pure.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-143",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/fbalpha2012_cps1.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-144",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/fbalpha2012_cps2.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-145",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/fbneo.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-146",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/fuse.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-147",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/gearcoleco.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-148",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/genesis_plus_gx.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-149",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/handy.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-150",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/mame2003.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-151",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/mame2003_plus.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-152",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/mednafen_ngp.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-153",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/mednafen_pce.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-154",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/mednafen_pcfx.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-155",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/mednafen_psx_hw.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-156",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/mednafen_wswan.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-157",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/melonds.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-158",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/mupen64plus_next.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-159",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/nestopia.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-160",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/opera.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-161",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/parallel_n64.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-162",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/pcsx_rearmed.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-163",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/picodrive.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-164",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/ppsspp.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-165",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/prboom.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-166",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/prosystem.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-167",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/puae.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-168",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/same_cdi.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-169",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/smsplus.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-170",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/stella2014.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-171",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/vice_x128.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-172",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/vice_x64.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-173",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/vice_x64sc.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-174",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/vice_xpet.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-175",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/vice_xplus4.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-176",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/vice_xvic.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-177",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/virtualjaguar.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-178",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/reports/yabause.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-179",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/same_cdi-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-180",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/same_cdi-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-181",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/same_cdi-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-182",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/same_cdi-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-183",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/smsplus-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-184",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/smsplus-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-185",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/smsplus-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-186",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/smsplus-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-187",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/snes9x-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-188",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/snes9x-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-189",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/stella2014-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-190",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/stella2014-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-191",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/stella2014-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-192",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/stella2014-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-193",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_x128-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-194",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_x128-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-195",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_x128-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-196",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_x128-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-197",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_x64-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-198",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_x64-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-199",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_x64-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-200",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_x64-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-201",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_x64sc-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-202",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_x64sc-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-203",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_x64sc-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-204",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_x64sc-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-205",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_xpet-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-206",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_xpet-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-207",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_xpet-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-208",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_xpet-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-209",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_xplus4-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-210",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_xplus4-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-211",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_xplus4-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-212",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_xplus4-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-213",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_xvic-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-214",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_xvic-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-215",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_xvic-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-216",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/vice_xvic-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-217",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/virtualjaguar-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-218",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/virtualjaguar-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-219",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/virtualjaguar-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-220",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/virtualjaguar-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-221",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/yabause-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-222",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/yabause-thread-legacy-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-223",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/yabause-thread-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-224",
+      "method": "GET",
+      "path": "/romm/assets/emulator/data/cores/yabause-wasm.data",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-225",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/81-libretro.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-226",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/FBNeo.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-227",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/Gearcoleco.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-228",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/Genesis-Plus-GX.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-229",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/a5200.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-230",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/beetle-ngp-libretro.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-231",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/beetle-pce-libretro.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-232",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/beetle-pcfx-libretro.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-233",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/beetle-psx-libretro.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-234",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/beetle-vb-libretro.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-235",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/beetle-wswan-libretro.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-236",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/desmume.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-237",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/dosbox-pure.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-238",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/fbalpha2012_cps1.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-239",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/fbalpha2012_cps2.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-240",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/fuse-libretro.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-241",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/gambatte-libretro.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-242",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/libretro-crocods.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-243",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/libretro-fceumm.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-244",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/libretro-prboom.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-245",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/libretro-uae.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-246",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/mame2003-libretro.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-247",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/mame2003-plus-libretro.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-248",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/melonDS.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-249",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/mgba.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-250",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/mupen64plus-libretro-nx.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-251",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/nestopia.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-252",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/pcsx_rearmed.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-253",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/picodrive.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-254",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/ppsspp.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-255",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/prosystem-libretro.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-256",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/same_cdi.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-257",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/snes9x.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-258",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/sources.json",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-core-pack-259",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/vice-libretro.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-pack-asset-449",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/desmume2015.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-pack-asset-450",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/libretro-cap32.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-pack-asset-451",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/libretro-handy.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-pack-asset-452",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/opera-libretro.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-pack-asset-453",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/parallel-n64.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-pack-asset-454",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/smsplus-gx.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-pack-asset-455",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/stella2014-libretro.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-pack-asset-456",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/virtualjaguar-libretro.txt",
+      "access": "authenticated"
+    },
+    {
+      "id": "romm-pack-asset-457",
+      "method": "GET",
+      "path": "/romm/assets/emulator/licenses/core-catalog/yabause.txt",
+      "access": "authenticated"
     }
   ],
   "global_config_schema": [
@@ -1375,8 +2983,8 @@
   "presentation": {
     "display_name": "RomM for Silo",
     "summary": "Your RomM collection, with browser play and personal saves.",
-    "description_markdown": "Browse platforms, collections and games from RomM. Connect each Silo profile to its own RomM account, then play NES, SNES, GB, GBC and GBA games using locally bundled EmulatorJS. Requires the Ramindex Silo loopback relay. No ROMs or BIOS are included.",
-    "setup_markdown": "Set the RomM server URL in plugin settings, reachable from Silo and your browser. Open Games, choose Sign in to RomM, and approve Silo Games using your normal RomM or OIDC login. Token and pairing-code entry remain available for older servers. Keep the plugin data directory on persistent storage.",
+    "description_markdown": "Browse platforms, collections and games from RomM. Connect each Silo profile to its own RomM account, then play systems supported by locally bundled EmulatorJS 4.2.3. Disc systems may require your BIOS files in RomM; PSP and DOS require an isolated player window. Requires the Ramindex Silo loopback relay. No ROMs or BIOS are included.",
+    "setup_markdown": "Set the RomM server URL in plugin settings, reachable from Silo and your browser. Open Games, choose Connect RomM, and approve Silo Games using your normal RomM or OIDC login. Token and pairing-code entry remain available for older servers. Keep the plugin data directory on persistent storage.",
     "homepage_url": "https://github.com/theramindex/silo-plugin-romm",
     "source_url": "https://github.com/theramindex/silo-plugin-romm",
     "support_url": "https://github.com/theramindex/silo-plugin-romm/issues",

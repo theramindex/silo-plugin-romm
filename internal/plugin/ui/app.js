@@ -137,7 +137,8 @@ function recentDeviceGames(namespace = library.connection?.namespace) {
         typeof g.name === "string" &&
         typeof g.platform_slug === "string" &&
         /^[a-z0-9_-]{1,64}$/.test(g.platform_slug) &&
-        ["fceumm", "snes9x", "gambatte", "mgba"].includes(g.core) &&
+        typeof g.core === "string" &&
+        /^[a-z0-9_]{1,64}$/.test(g.core) &&
         Number.isFinite(Date.parse(g.rom_user?.last_played)),
     )
     .slice(0, 12);
@@ -282,11 +283,11 @@ function connectionForm() {
   library.ready = false;
   $("header-search").hidden = true;
   $("main").innerHTML =
-    '<section class="connect"><h1>Connect your games</h1><p>Connect this Silo profile to your RomM account to browse your collection and keep saved progress with you.</p>' +
+    '<section class="connect"><h1>Connect RomM</h1><p>Your games and saves, here in Silo.</p>' +
     (!library.connection.configured
       ? '<div class="empty"><h2>RomM needs a server address</h2><p>Ask your Silo administrator to set the RomM server address in this plugin’s settings.</p></div>'
-      : '<div class="browser-sign-in"><button type="button" class="primary" id="romm-sign-in">Sign in to RomM</button><p class="help">Sign in with your RomM account or SSO, then approve Silo Games. This connection is saved for your current Silo profile.</p><div id="romm-sign-in-progress" role="status" aria-live="polite"></div></div><details class="manual-connection"><summary>Use a token or pairing code</summary><form id="connect-form"><label for="token">RomM client token</label><input id="token" name="token" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your client token"><div class="or">or use a pairing code</div><label for="pair-code">Pairing code</label><input id="pair-code" name="code" autocomplete="off" spellcheck="false" maxlength="100"><p class="help">Create a client token in RomM with access to your profile, games, platforms, collections, firmware, and read/write game assets. Only your account’s permissions apply.</p><button class="primary" type="submit">Connect account</button><p id="connect-error" role="alert"></p></form></details>') +
-    '<p class="help">Browser play: NES · SNES · Game Boy · Game Boy Color · Game Boy Advance<br>No games or BIOS files are included.</p></section>';
+      : '<div class="browser-sign-in"><button type="button" class="primary" id="romm-sign-in">Connect RomM</button><div id="romm-sign-in-progress" role="status" aria-live="polite"></div></div><details class="manual-connection"><summary>More sign-in options</summary><form id="connect-form"><label for="token">RomM client token</label><input id="token" name="token" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your client token"><div class="or">or use a pairing code</div><label for="pair-code">Pairing code</label><input id="pair-code" name="code" autocomplete="off" spellcheck="false" maxlength="100"><p class="help">Create a client token in RomM with access to your profile, games, platforms, collections, firmware, and read/write game assets. Only your account’s permissions apply.</p><button class="primary" type="submit">Connect account</button><p id="connect-error" role="alert"></p></form></details>') +
+    "</section>";
   if ($("romm-sign-in"))
     $("romm-sign-in").addEventListener("click", beginRomMSignIn);
   if ($("connect-form"))
@@ -325,6 +326,15 @@ function signInMessage(text) {
   const root = $("romm-sign-in-progress");
   if (root) root.textContent = text;
 }
+function retryRomMSignIn(message) {
+  signInMessage(message);
+  const button = $("romm-sign-in");
+  if (button) {
+    button.hidden = false;
+    button.disabled = false;
+    button.textContent = "Sign in again";
+  }
+}
 async function finishRomMSignIn(connection) {
   stopRomMSignIn();
   library.connection = connection;
@@ -355,12 +365,16 @@ async function beginRomMSignIn() {
     rommSignIn.flow = flow;
     const root = $("romm-sign-in-progress");
     if (!root) return;
+    button.hidden = true;
     root.innerHTML =
-      '<p>Approve <strong>Silo Games</strong> in RomM. Check that the code matches:</p><code class="approval-code">' +
-      esc(flow.userCode) +
-      '</code><p><a class="approval-link" href="' +
+      '<p>Approve <strong>Silo Games</strong> in RomM.</p><p id="romm-approval-message">Waiting for approval…</p><a class="approval-link" href="' +
       esc(flow.verificationUrl) +
-      '" target="_blank" rel="noopener noreferrer">Continue to RomM <span class="sr-only">(opens a new tab)</span></a></p><p class="help">Keep this page open. You will connect automatically after approval.</p><p id="romm-approval-message"></p><button type="button" id="romm-sign-in-cancel">Cancel sign-in</button>';
+      '" target="_blank" rel="noopener noreferrer">Continue to RomM <span class="sr-only">(opens a new tab)</span></a><details class="approval-options"><summary>Having trouble signing in?</summary><p>Check this code in RomM:</p><code class="approval-code">' +
+      esc(flow.userCode) +
+      '</code><p><a href="' +
+      esc(flow.loginUrl || flow.verificationUrl) +
+      '" target="_blank" rel="noopener noreferrer">Use another RomM login</a></p><button type="button" id="romm-sign-in-restart">Start a new sign-in</button></details><button type="button" id="romm-sign-in-cancel">Cancel sign-in</button>';
+    $("romm-sign-in-restart").onclick = beginRomMSignIn;
     $("romm-sign-in-cancel").onclick = async () => {
       const id = flow.id;
       stopRomMSignIn();
@@ -374,8 +388,7 @@ async function beginRomMSignIn() {
         }
       } catch {}
       if (cancelledGeneration !== rommSignIn.generation) return;
-      signInMessage("Sign-in cancelled. You can try again.");
-      button.disabled = false;
+      retryRomMSignIn("Sign-in cancelled.");
       button.focus();
     };
     if (popup && !popup.closed) popup.location.replace(flow.verificationUrl);
@@ -383,8 +396,7 @@ async function beginRomMSignIn() {
   } catch (error) {
     if (popup && !popup.closed) popup.close();
     if (generation !== rommSignIn.generation) return;
-    signInMessage(error.message);
-    button.disabled = false;
+    retryRomMSignIn(error.message);
   }
 }
 async function pollRomMSignIn(generation) {
@@ -399,8 +411,7 @@ async function pollRomMSignIn(generation) {
     }
     if (result.status !== "pending") {
       stopRomMSignIn();
-      signInMessage(result.message || "Sign-in ended. Start again.");
-      if ($("romm-sign-in")) $("romm-sign-in").disabled = false;
+      retryRomMSignIn(result.message || "Sign-in ended.");
       return;
     }
     flow.interval = result.interval;
@@ -411,8 +422,7 @@ async function pollRomMSignIn(generation) {
     if (generation !== rommSignIn.generation) return;
     if (error.status === 409 || error.status === 401) {
       stopRomMSignIn();
-      signInMessage("This sign-in is no longer active. Start again.");
-      if ($("romm-sign-in")) $("romm-sign-in").disabled = false;
+      retryRomMSignIn("This sign-in has expired.");
       return;
     }
     if ($("romm-approval-message"))
@@ -1250,6 +1260,11 @@ function gameCardMarkup(g) {
     ) +
     '">' +
     coverMarkup(g) +
+    (playable
+      ? '<span class="platform-play-badge" title="Playable in Silo" aria-hidden="true">' +
+        icon("play") +
+        "</span>"
+      : "") +
     '<span class="game-card-title">' +
     esc(titleOf(g)) +
     '</span><span class="game-card-meta"><span>' +
@@ -1257,11 +1272,6 @@ function gameCardMarkup(g) {
     "</span>" +
     (g.version_count > 1
       ? '<span class="version-count">' + g.version_count + " versions</span>"
-      : "") +
-    (playable
-      ? '<span class="play-indicator" title="Supported in Silo">' +
-        icon("play") +
-        '<span class="sr-only">Supported in Silo</span></span>'
       : "") +
     "</span></button>"
   );
@@ -1539,7 +1549,7 @@ async function loadGames() {
           : library.recent
             ? "Games played in RomM appear here. Games started in Silo are kept in this device’s history above."
             : library.playable
-              ? "Silo supports NES, SNES, Game Boy, Game Boy Color, and Game Boy Advance. Try another platform or turn off the playable filter."
+              ? "No supported games match these filters. Try another platform or turn off the playable filter."
               : "Try another search, platform, or collection.") +
         '</p><button id="clear-filters">Clear filters</button></div>';
     hydrateArtwork(grid);
@@ -1711,7 +1721,7 @@ async function renderGameDetail(id, from) {
                 : "Play here with your connected RomM account."
               : "Saved progress will be checked again before launch.") +
             "</p>"
-          : '<p class="unsupported-message">This platform is available to browse. Browser play in Silo supports NES, SNES, Game Boy, Game Boy Color, and Game Boy Advance.</p>') +
+          : '<p class="unsupported-message">This platform is available to browse. It is not supported by the bundled EmulatorJS version.</p>') +
       '<p id="launch-status" role="status"></p></div></section><div class="detail-description"><section class="game-about"><h2>About this game</h2><p class="game-summary">' +
       esc(g.summary || "RomM has no description for this game yet.") +
       "</p></section>" +
@@ -2026,8 +2036,8 @@ function progressKey(kind) {
 async function keepProgress(kind, data) {
   if (!data || !data.byteLength) return;
   const bytes = new Uint8Array(data);
-  if (bytes.byteLength > 16 * 1024 * 1024)
-    throw new Error("Progress exceeds the 16 MiB save limit.");
+  if (bytes.byteLength > 128 * 1024 * 1024)
+    throw new Error("Progress exceeds the 128 MiB save limit.");
   await outbox("put", {
     key: progressKey(kind),
     data: bytes,
@@ -2134,6 +2144,21 @@ async function startPlayer() {
   $("pause").onclick = openPause;
   $("save").onclick = () => queueSave();
   $("exit").onclick = saveExit;
+  const threads = !!s.game.emulation?.requires_threads;
+  if (
+    threads &&
+    (!crossOriginIsolated || typeof SharedArrayBuffer !== "function")
+  )
+    throw new Error(
+      "This emulator needs an isolated player window. Reopen Games after updating Silo, then try again.",
+    );
+  if (
+    s.game.emulation?.requires_webgl2 &&
+    !document.createElement("canvas").getContext("webgl2")
+  )
+    throw new Error(
+      "This emulator needs WebGL 2. Try a browser or device with WebGL 2 enabled.",
+    );
   await outboxDB().then((db) => db.close());
   const [rom, remoteSave, pendingSave, pendingState] = await Promise.all([
     fetchBinary("rom"),
@@ -2149,7 +2174,7 @@ async function startPlayer() {
   const saveData = pendingSave?.data || remoteSave;
   window.EJS_player = "#game";
   window.EJS_core = s.game.core;
-  window.EJS_gameUrl = blob(rom);
+  window.EJS_gameUrl = new File([rom], s.game.fs_name);
   window.EJS_gameName = s.namespace;
   window.EJS_gameID = 1;
   window.EJS_pathtodata = new URL(
@@ -2157,12 +2182,12 @@ async function startPlayer() {
     document.baseURI,
   ).href;
   window.EJS_startOnLoaded = true;
-  window.EJS_threads = false;
+  window.EJS_threads = threads;
   window.EJS_disableAutoLang = true;
   window.EJS_language = "en-US";
   window.EJS_disableDatabases = true;
   window.EJS_defaultOptions = {
-    ejs_threads: "disabled",
+    ejs_threads: threads ? "enabled" : "disabled",
     "save-state-location": "download",
   };
   window.EJS_Buttons = {
@@ -2173,7 +2198,8 @@ async function startPlayer() {
     loadState: { visible: false },
     netplay: { visible: false },
   };
-  if (s.biosId) window.EJS_biosUrl = blob(await fetchBinary("bios"));
+  if (s.biosId)
+    window.EJS_biosUrl = new File([await fetchBinary("bios")], s.biosName);
   if (pendingState?.data) window.EJS_loadStateURL = blob(pendingState.data);
   else if (s.stateId)
     window.EJS_loadStateURL = blob(await fetchBinary("states"));

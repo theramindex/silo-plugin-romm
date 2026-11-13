@@ -1,8 +1,8 @@
 # RomM for Silo
 
 Games from your RomM server, in a full-page Silo plugin. Browse platforms,
-collections and search results, then play NES, SNES, Game Boy, Game Boy Color
-and Game Boy Advance games using bundled EmulatorJS 4.2.3. No iframe, ROMs,
+collections and search results, then play systems supported by bundled
+EmulatorJS 4.2.3, including 3DO, PlayStation, Sega, Nintendo, Atari and DOS. No iframe, ROMs,
 BIOS files, CDN runtime or remote emulator cores.
 
 The library opens on a platform overview with locally bundled system
@@ -79,8 +79,12 @@ pending progress has synced; reconnecting intentionally creates a new namespace.
 
 ROM downloads use the Ramindex Silo authenticated loopback relay. Progress
 uploads use bounded chunks under Silo's gRPC request limit. ROMs are limited
-to 64 MiB and each save/state to 16 MiB. The initial cores do not require
-threaded SharedArrayBuffer or COOP/COEP. The dedicated player document permits
+to 2 GiB and each save/state to 128 MiB, with a shared 256 MiB upload queue.
+Actual compatibility and performance depend on the core, game and browser.
+Firmware is fetched from your RomM platform with its original filenames;
+required firmware must be installed before launch. RomM packages multi-file
+discs for the emulator. PSP and DOS require SharedArrayBuffer and an isolated
+player window; the Silo host forwards COOP/COEP on that document. The dedicated player document permits
 `unsafe-eval` for the pinned Emscripten wrapper; the library document does not.
 A CSP meta policy survives Silo's response-header filtering.
 

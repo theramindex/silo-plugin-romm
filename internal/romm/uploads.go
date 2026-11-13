@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-const maxUpload = 16 << 20
+const maxUpload = 128 << 20
 const maxChunk = 512 << 10
 
 type Upload struct {
@@ -93,7 +93,15 @@ func (e *Engine) Upload(ctx context.Context, owner string, in UploadRequest) (Up
 	} else {
 		if len(u.Data)+len(data) > maxUpload {
 			e.mu.Unlock()
-			return UploadResult{}, errors.New("Save exceeds the 16 MiB limit")
+			return UploadResult{}, errors.New("Save exceeds the 128 MiB limit")
+		}
+		total := len(data)
+		for _, pending := range e.uploads {
+			total += len(pending.Data)
+		}
+		if total > 256<<20 {
+			e.mu.Unlock()
+			return UploadResult{}, errors.New("Save queue is full; finish another upload first")
 		}
 		u.Data = append(u.Data, data...)
 	}

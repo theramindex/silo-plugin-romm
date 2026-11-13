@@ -18,6 +18,7 @@ type SignIn struct {
 	Status          string      `json:"status"`
 	UserCode        string      `json:"userCode,omitempty"`
 	VerificationURL string      `json:"verificationUrl,omitempty"`
+	LoginURL        string      `json:"loginUrl,omitempty"`
 	ExpiresAt       int64       `json:"expiresAt"`
 	Interval        int         `json:"interval"`
 	Message         string      `json:"message,omitempty"`
@@ -124,6 +125,7 @@ func (e *Engine) StartSignIn(ctx context.Context, owner string) (SignIn, error) 
 	a.Code = issued.DeviceCode
 	a.Expires = time.Now().Add(time.Duration(issued.Expires) * time.Second)
 	a.Public = SignIn{ID: a.Public.ID, Status: "pending", UserCode: issued.UserCode, VerificationURL: base + "/pair/device?user_code=" + url.QueryEscape(issued.UserCode), ExpiresAt: a.Expires.Unix(), Interval: max(1, min(60, issued.Interval))}
+	a.Public.LoginURL = base + "/login?bypass_autologin=true&next=" + url.QueryEscape("/pair/device?user_code="+url.QueryEscape(issued.UserCode))
 	return a.Public, nil
 }
 func (e *Engine) CancelSignIn(owner, id string) (SignIn, error) {

@@ -6,21 +6,25 @@ licenses; this file does not relicense emulator cores or fonts.
 - EmulatorJS 4.2.3, GPL-3.0: https://github.com/EmulatorJS/EmulatorJS/tree/v4.2.3
   Archive: https://github.com/EmulatorJS/EmulatorJS/releases/download/v4.2.3/4.2.3.7z
   Runtime license: `internal/plugin/emulator/LICENSE`.
-- FCEUmm: https://github.com/EmulatorJS/libretro-fceumm
-- Snes9x: https://github.com/EmulatorJS/snes9x — its separate personal,
-  non-commercial Snes9x license applies. Do not assume this core is GPL.
-- Gambatte: https://github.com/EmulatorJS/gambatte-libretro
-- mGBA: https://github.com/EmulatorJS/mgba
-- Core build source: https://github.com/EmulatorJS/build
-  Build timestamps accompany the binaries under `data/cores/reports/`.
-  Modern and legacy **non-threaded** builds are included for these four cores.
-  Core license texts are in `internal/plugin/emulator/licenses/`.
+- EmulatorJS core pack 2.0.2 from the pinned 4.2.3 release archive above
+  (SHA-256 `07d451bc06fa3ad04ab30d9b94eb63ac34ad0babee52d60357b002bde8f3850b`).
+  All 48 core definitions and the release's 187 modern/legacy/threaded builds
+  are included, along with PPSSPP's runtime assets. Build reports and the
+  upstream `cores.json` preserve source repository references and build dates.
+  Core license texts and their source URLs are under
+  `internal/plugin/emulator/licenses/core-catalog/`. Each core retains its own
+  license, including the non-commercial Snes9x, Genesis Plus GX, FBNeo and
+  older MAME terms; the plugin's GPL does not replace those terms.
+  Source repositories: `data/cores/cores.json`; build source:
+  https://github.com/EmulatorJS/build
 - Plus Jakarta Sans, SIL Open Font License: copied from the existing Ramindex
   HDHomeRun plugin assets. Original: https://github.com/tokotype/PlusJakartaSans
 
 Local EmulatorJS changes: `checkForUpdates()` returns without network access;
 a missing local core reports failure before the upstream CDN fallback. The
-readable source accompanies the minified bundle. Rebuild that bundle with
+readable source accompanies the minified bundle. Explicit cores stay pinned to
+the session’s save namespace; the core-switch menu is available only for
+generic-system integrations. Rebuild that bundle with
 Terser (installed outside this checkout), concatenating these files in order:
 
 ```sh
