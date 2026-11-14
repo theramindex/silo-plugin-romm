@@ -535,6 +535,18 @@ fs.mkdirSync(shots, { recursive: true });
       "mobile Home overflow",
     );
     await page.screenshot({ path: shots + "/home-mobile-light.png" });
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = "32px";
+    });
+    assert(
+      await page.locator(".home-shelf .section-heading").evaluateAll((headings) =>
+        headings.every((heading) => heading.scrollWidth <= heading.clientWidth + 1),
+      ),
+      "Home shelf controls must fit a 320px viewport at 200% text size",
+    );
+    await page.evaluate(() => {
+      document.documentElement.style.removeProperty("font-size");
+    });
     await page.goto(root + "/romm?theme=light#platforms");
     await page.locator(".platform-tile").first().waitFor();
     assert(

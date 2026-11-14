@@ -670,6 +670,9 @@ button.primary {
 .home-shelf {
   margin-bottom: 24px;
 }
+.home-shelf .section-heading {
+  flex-wrap: wrap;
+}
 .shelf-actions {
   display: flex;
   align-items: center;
